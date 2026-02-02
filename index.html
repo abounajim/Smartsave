@@ -22,11 +22,17 @@
         @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); } 50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.8); } }
         .confetti { position: fixed; width: 10px; height: 10px; background: #f0f; animation: confetti-fall 3s linear forwards; z-index: 9999; }
         @keyframes confetti-fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
-        .progress-ring { transform: rotate(-90deg); }
-        .floating { animation: floating 3s ease-in-out infinite; }
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .notification { animation: slideInRight 0.5s ease-out; }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .bank-card { transition: all 0.3s ease; cursor: pointer; }
+        .bank-card:hover { transform: scale(1.05); border-color: rgba(99, 102, 241, 0.5); }
+        .sync-spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .fade-out { animation: fadeOut 0.5s ease-out forwards; }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        .demo-bg { filter: blur(2px) brightness(0.4); pointer-events: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; z-index: 0; }
+        .empty-state { text-align: center; padding: 3rem 1rem; color: #6b7280; }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+        .progress-bar-striped { background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem; animation: progress-bar-stripes 1s linear infinite; }
+        @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
     </style>
 </head>
 <body class="text-white min-h-screen overflow-x-hidden">
@@ -34,8 +40,166 @@
     <!-- Confetti Container -->
     <div id="confetti-container"></div>
 
+    <!-- DEMO BACKGROUND (Visible only when logged out) -->
+    <div id="demo-background" class="demo-bg">
+        <div class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto opacity-50">
+            <div class="mb-8">
+                <h1 class="text-4xl md:text-5xl font-bold mb-2">Welcome back, <span class="gradient-text">Demo User</span>! 🎯</h1>
+                <p class="text-gray-400 text-lg">Your AI coach has saved you <span class="text-green-400 font-bold">$245</span> this month</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="glass rounded-2xl p-6"><div class="flex justify-between items-start"><div><p class="text-gray-400 text-sm">Total Savings</p><h3 class="text-3xl font-bold text-emerald-400">$12,450</h3></div><i class="fas fa-wallet text-emerald-400 text-xl"></i></div></div>
+                <div class="glass rounded-2xl p-6"><div class="flex justify-between items-start"><div><p class="text-gray-400 text-sm">Monthly Budget</p><h3 class="text-3xl font-bold text-blue-400">$3,500</h3></div><i class="fas fa-calendar-alt text-blue-400 text-xl"></i></div><div class="w-full bg-gray-700 rounded-full h-2 mt-2"><div class="bg-blue-500 h-2 rounded-full" style="width: 65%"></div></div></div>
+                <div class="glass rounded-2xl p-6"><div class="flex justify-between items-start"><div><p class="text-gray-400 text-sm">Active Goals</p><h3 class="text-3xl font-bold text-purple-400">5</h3></div><i class="fas fa-bullseye text-purple-400 text-xl"></i></div></div>
+                <div class="glass rounded-2xl p-6"><div class="flex justify-between items-start"><div><p class="text-gray-400 text-sm">Current Streak</p><h3 class="text-3xl font-bold text-orange-400">24</h3></div><i class="fas fa-fire text-orange-400 text-xl streak-flame"></i></div></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 glass rounded-2xl p-6 h-96 flex items-center justify-center">
+                    <div class="text-center"><i class="fas fa-chart-pie text-6xl text-gray-600 mb-4"></i><p class="text-gray-500">Demo Analytics Preview</p></div>
+                </div>
+                <div class="space-y-4">
+                    <div class="glass rounded-2xl p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-500/20"></div><div class="flex-1"><div class="h-4 bg-gray-700 rounded w-3/4 mb-2"></div><div class="h-3 bg-gray-800 rounded w-1/2"></div></div></div></div>
+                    <div class="glass rounded-2xl p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-500/20"></div><div class="flex-1"><div class="h-4 bg-gray-700 rounded w-3/4 mb-2"></div><div class="h-3 bg-gray-800 rounded w-1/2"></div></div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm">
+        <div class="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center relative z-10">
+            <div class="text-center md:text-left">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto md:mx-0 mb-6 floating">
+                    <i class="fas fa-piggy-bank text-4xl"></i>
+                </div>
+                <h1 class="text-5xl font-bold mb-4 gradient-text">SmartSave AI</h1>
+                <p class="text-xl text-gray-300 mb-6">Your intelligent financial companion that connects to your bank and automatically saves money using AI.</p>
+                <div class="space-y-3 hidden md:block">
+                    <div class="flex items-center gap-3 text-gray-300"><i class="fas fa-check-circle text-emerald-400"></i><span>AI-Powered categorization</span></div>
+                    <div class="flex items-center gap-3 text-gray-300"><i class="fas fa-check-circle text-emerald-400"></i><span>Connect unlimited bank accounts</span></div>
+                    <div class="flex items-center gap-3 text-gray-300"><i class="fas fa-check-circle text-emerald-400"></i><span>Automatic savings recommendations</span></div>
+                </div>
+            </div>
+            
+            <div class="glass rounded-3xl p-8 border border-gray-700 shadow-2xl bg-slate-900/80">
+                <div class="flex gap-4 mb-6">
+                    <button onclick="switchAuthMode('login')" id="tab-login" class="flex-1 py-2 rounded-xl bg-indigo-600 text-white font-semibold transition-all">Login</button>
+                    <button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-2 rounded-xl bg-gray-800 text-gray-400 font-semibold transition-all">Sign Up</button>
+                </div>
+
+                <form id="auth-form" class="space-y-4">
+                    <div id="name-field" class="hidden">
+                        <label class="block text-sm text-gray-400 mb-2">Full Name</label>
+                        <input type="text" id="user-name" class="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Email Address</label>
+                        <input type="email" id="user-email" class="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="john@example.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Password</label>
+                        <input type="password" id="user-password" class="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-bold hover:shadow-lg hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2">
+                        <span id="auth-btn-text">Login</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-6 border-t border-gray-700">
+                    <p class="text-center text-sm text-gray-400 mb-4">Secure 256-bit SSL Encryption</p>
+                    <div class="flex justify-center gap-4 text-gray-500">
+                        <i class="fas fa-shield-alt text-2xl"></i>
+                        <i class="fas fa-lock text-2xl"></i>
+                        <i class="fas fa-user-shield text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bank Connection Modal -->
+    <div id="bank-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeBankModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl p-6 glass rounded-3xl border border-gray-700 max-h-[90vh] overflow-y-auto bg-slate-900">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold">Connect Your Bank</h3>
+                    <p class="text-gray-400 text-sm">Securely link your accounts for automatic tracking</p>
+                </div>
+                <button onclick="closeBankModal()" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div id="bank-selection">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <div onclick="selectBank('Chase')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
+                        <div class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-bold">C</div>
+                        <span class="font-semibold">Chase</span>
+                    </div>
+                    <div onclick="selectBank('Bank of America')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
+                        <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-2xl font-bold">B</div>
+                        <span class="font-semibold">Bank of America</span>
+                    </div>
+                    <div onclick="selectBank('Wells Fargo')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
+                        <div class="w-16 h-16 rounded-full bg-yellow-600 flex items-center justify-center text-2xl font-bold">W</div>
+                        <span class="font-semibold">Wells Fargo</span>
+                    </div>
+                    <div onclick="selectBank('Citibank')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
+                        <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-2xl font-bold">C</div>
+                        <span class="font-semibold">Citibank</span>
+                    </div>
+                    <div onclick="selectBank('Capital One')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
+                        <div class="w-16 h-16 rounded-full bg-blue-800 flex items-center justify-center text-2xl font-bold">C</div>
+                        <span class="font-semibold">Capital One</span>
+                    </div>
+                    <div onclick="selectBank('Other')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
+                        <div class="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-2xl font-bold">+</div>
+                        <span class="font-semibold">Other Banks</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bank-login" class="hidden space-y-4">
+                <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center gap-3 mb-4">
+                    <i class="fas fa-shield-alt text-indigo-400 text-xl"></i>
+                    <div>
+                        <p class="font-semibold text-indigo-200">Bank-Level Security</p>
+                        <p class="text-sm text-gray-400">We never store your login credentials</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Username</label>
+                    <input type="text" id="bank-username" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="Enter bank username">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Password</label>
+                    <input type="password" id="bank-password" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="Enter bank password">
+                </div>
+                <button onclick="connectBank()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-link"></i> Connect Securely
+                </button>
+                <button onclick="backToBanks()" class="w-full py-3 border border-gray-600 rounded-xl hover:bg-gray-800 transition-all">Back</button>
+            </div>
+
+            <div id="bank-loading" class="hidden py-12 text-center">
+                <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full sync-spinner mx-auto mb-4"></div>
+                <p class="text-lg font-semibold">Connecting to your bank...</p>
+                <div class="mt-6 space-y-2 text-left max-w-sm mx-auto px-4">
+                    <div class="flex items-center gap-2 text-sm text-gray-400" id="step-1"><i class="fas fa-circle text-gray-600 text-xs"></i> Establishing secure connection</div>
+                    <div class="flex items-center gap-2 text-sm text-gray-400" id="step-2"><i class="fas fa-circle text-gray-600 text-xs"></i> Authenticating credentials</div>
+                    <div class="flex items-center gap-2 text-sm text-gray-400" id="step-3"><i class="fas fa-circle text-gray-600 text-xs"></i> Retrieving transactions</div>
+                    <div class="flex items-center gap-2 text-sm text-gray-400" id="step-4"><i class="fas fa-circle text-gray-600 text-xs"></i> Categorizing with AI</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass border-b border-gray-800">
+    <nav class="fixed top-0 w-full z-40 glass border-b border-gray-800 hidden" id="main-nav">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
@@ -47,180 +211,147 @@
                 <div class="flex items-center gap-6">
                     <div class="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30">
                         <i class="fas fa-fire text-orange-500 streak-flame"></i>
-                        <span class="font-bold text-orange-400" id="streak-display">12 Day Streak!</span>
+                        <span class="font-bold text-orange-400" id="streak-display">0 Day Streak</span>
                     </div>
-                    <button onclick="toggleProfile()" class="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center hover:scale-110 transition-transform">
-                        <i class="fas fa-user"></i>
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <button onclick="openBankModal()" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-all">
+                            <i class="fas fa-plus"></i> Add Bank
+                        </button>
+                        <div class="relative group">
+                            <button class="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center hover:scale-110 transition-transform">
+                                <span id="user-initial" class="font-bold">U</span>
+                            </button>
+                            <div class="absolute right-0 top-12 w-48 glass rounded-xl border border-gray-700 p-2 hidden group-hover:block bg-slate-900">
+                                <button onclick="logout()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 text-red-400 flex items-center gap-2">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <!-- Main Content (Zeroed State) -->
+    <main class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto hidden" id="main-content">
         
-        <!-- Welcome Section -->
-        <div class="mb-8 slide-in">
-            <h1 class="text-4xl md:text-5xl font-bold mb-2">Welcome back, <span class="gradient-text">Saver!</span> 🎯</h1>
-            <p class="text-gray-400 text-lg">Your AI coach has saved you <span class="text-green-400 font-bold">$245</span> this month</p>
+        <!-- Empty State Banner -->
+        <div class="mb-8 text-center slide-in">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">Welcome, <span class="gradient-text" id="display-name">Saver</span>! 🎉</h1>
+            <p class="text-gray-400 text-lg">Start your savings journey by connecting a bank or adding your first transaction</p>
         </div>
 
-        <!-- Quick Stats Grid -->
+        <!-- Zeroed Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Total Savings -->
             <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Total Savings</p>
-                        <h3 class="text-3xl font-bold text-emerald-400" id="total-savings">$4,250</h3>
+                        <h3 class="text-3xl font-bold text-emerald-400" id="total-savings">$0</h3>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
                         <i class="fas fa-wallet text-emerald-400 text-xl"></i>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
-                    <span class="text-emerald-400 flex items-center gap-1">
-                        <i class="fas fa-arrow-up"></i> 12.5%
-                    </span>
-                    <span class="text-gray-500">vs last month</span>
-                </div>
+                <p class="text-sm text-gray-500">Start saving to see growth</p>
             </div>
 
             <!-- Monthly Budget -->
             <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Monthly Budget</p>
-                        <h3 class="text-3xl font-bold text-blue-400" id="monthly-budget">$2,000</h3>
+                        <h3 class="text-3xl font-bold text-blue-400" id="monthly-budget">$0</h3>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
                         <i class="fas fa-calendar-alt text-blue-400 text-xl"></i>
                     </div>
                 </div>
                 <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
-                    <div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: 65%" id="budget-progress"></div>
+                    <div class="bg-gray-600 h-2 rounded-full transition-all duration-500" style="width: 0%" id="budget-progress"></div>
                 </div>
-                <p class="text-xs text-gray-400 mt-2">$1,300 spent ($700 left)</p>
+                <p class="text-xs text-gray-400 mt-2">Set a budget to get started</p>
             </div>
 
             <!-- Active Goals -->
             <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Active Goals</p>
-                        <h3 class="text-3xl font-bold text-purple-400" id="active-goals">3</h3>
+                        <h3 class="text-3xl font-bold text-purple-400" id="active-goals">0</h3>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
                         <i class="fas fa-bullseye text-purple-400 text-xl"></i>
                     </div>
                 </div>
-                <div class="flex -space-x-2 mt-2">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 border-2 border-gray-800 flex items-center justify-center text-xs">✈️</div>
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-cyan-500 border-2 border-gray-800 flex items-center justify-center text-xs">🚗</div>
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-pink-400 to-rose-500 border-2 border-gray-800 flex items-center justify-center text-xs">🎓</div>
-                </div>
+                <p class="text-sm text-gray-500">No active goals yet</p>
             </div>
 
             <!-- Streak Status -->
-            <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden pulse-glow">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+            <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Current Streak</p>
                         <h3 class="text-3xl font-bold text-orange-400 flex items-center gap-2">
-                            <span id="streak-count">12</span>
-                            <i class="fas fa-fire text-2xl streak-flame"></i>
+                            <span id="streak-count">0</span>
+                            <i class="fas fa-fire text-2xl opacity-30"></i>
                         </h3>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
                         <i class="fas fa-trophy text-orange-400 text-xl"></i>
                     </div>
                 </div>
-                <p class="text-sm text-gray-400">Next reward at 15 days! 🎁</p>
+                <p class="text-sm text-gray-400">Start logging to build streaks!</p>
+            </div>
+        </div>
+
+        <!-- Getting Started CTA -->
+        <div class="mb-8 glass rounded-2xl p-8 border border-indigo-500/30 relative overflow-hidden bg-gradient-to-br from-indigo-900/20 to-purple-900/20 slide-in">
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 pulse-glow">
+                        <i class="fas fa-rocket text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-1">Ready to start saving?</h3>
+                        <p class="text-gray-400">Connect your bank account for automatic tracking</p>
+                    </div>
+                </div>
+                <button onclick="openBankModal()" class="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-bold hover:shadow-lg hover:shadow-indigo-500/30 transition-all flex items-center gap-2 whitespace-nowrap">
+                    <i class="fas fa-link"></i> Connect First Bank
+                </button>
             </div>
         </div>
 
         <!-- Main Dashboard Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <!-- Left Column: Charts & Analytics -->
+            <!-- Left Column -->
             <div class="lg:col-span-2 space-y-8">
                 
-                <!-- Spending Chart -->
-                <div class="glass rounded-2xl p-6 slide-in">
+                <!-- Empty Analytics State -->
+                <div class="glass rounded-2xl p-6 slide-in min-h-[400px] flex flex-col">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2">
                             <i class="fas fa-chart-pie text-indigo-400"></i>
                             Spending Analytics
                         </h3>
-                        <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-indigo-500">
-                            <option>This Month</option>
-                            <option>Last Month</option>
-                            <option>Last 3 Months</option>
-                        </select>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="relative h-64">
-                            <canvas id="spendingChart"></canvas>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-gray-800/50">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-lg bg-rose-500/20 flex items-center justify-center">
-                                        <i class="fas fa-utensils text-rose-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold">Food & Dining</p>
-                                        <p class="text-xs text-gray-400">32% of budget</p>
-                                    </div>
-                                </div>
-                                <span class="font-bold text-rose-400">$420</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-gray-800/50">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                                        <i class="fas fa-shopping-bag text-blue-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold">Shopping</p>
-                                        <p class="text-xs text-gray-400">28% of budget</p>
-                                    </div>
-                                </div>
-                                <span class="font-bold text-blue-400">$350</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-gray-800/50">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                                        <i class="fas fa-bus text-emerald-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold">Transport</p>
-                                        <p class="text-xs text-gray-400">15% of budget</p>
-                                    </div>
-                                </div>
-                                <span class="font-bold text-emerald-400">$180</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-gray-800/50">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                                        <i class="fas fa-film text-purple-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold">Entertainment</p>
-                                        <p class="text-xs text-gray-400">12% of budget</p>
-                                    </div>
-                                </div>
-                                <span class="font-bold text-purple-400">$150</span>
-                            </div>
+                    <div class="flex-1 flex items-center justify-center" id="chart-container">
+                        <div class="empty-state">
+                            <i class="fas fa-chart-pie text-gray-600"></i>
+                            <h4 class="text-lg font-semibold text-gray-400 mb-2">No data yet</h4>
+                            <p class="text-sm text-gray-500 mb-4">Connect a bank account or add transactions to see your spending analytics</p>
+                            <button onclick="openBankModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm transition-colors">
+                                Connect Bank
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Savings Goals -->
+                <!-- Empty Goals State -->
                 <div class="glass rounded-2xl p-6 slide-in">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2">
@@ -231,120 +362,49 @@
                             <i class="fas fa-plus"></i> New Goal
                         </button>
                     </div>
-                    
-                    <div class="space-y-4" id="goals-container">
-                        <!-- Goal 1: Travel -->
-                        <div class="p-4 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 relative overflow-hidden group">
-                            <div class="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-2xl">
-                                        ✈️
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-lg">Travel to Japan</h4>
-                                        <p class="text-sm text-gray-400">Target: 10 months • $1,000</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-2xl font-bold text-yellow-400">$650</p>
-                                    <p class="text-xs text-gray-400">saved</p>
-                                </div>
-                            </div>
-                            <div class="relative pt-1">
-                                <div class="flex mb-2 items-center justify-between">
-                                    <div class="text-xs font-semibold text-yellow-400">65% Complete</div>
-                                    <div class="text-xs text-gray-400">$350 to go</div>
-                                </div>
-                                <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-700">
-                                    <div style="width:65%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-500"></div>
-                                </div>
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="text-gray-400">Monthly need: <span class="text-white font-bold">$35</span></span>
-                                    <span class="text-emerald-400 flex items-center gap-1">
-                                        <i class="fas fa-check-circle"></i> On Track
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Goal 2: Car -->
-                        <div class="p-4 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 relative overflow-hidden group">
-                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-2xl">
-                                        🚗
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-lg">New Car Down Payment</h4>
-                                        <p class="text-sm text-gray-400">Target: 24 months • $15,000</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-2xl font-bold text-blue-400">$3,200</p>
-                                    <p class="text-xs text-gray-400">saved</p>
-                                </div>
-                            </div>
-                            <div class="relative pt-1">
-                                <div class="flex mb-2 items-center justify-between">
-                                    <div class="text-xs font-semibold text-blue-400">21% Complete</div>
-                                    <div class="text-xs text-gray-400">$11,800 to go</div>
-                                </div>
-                                <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-700">
-                                    <div style="width:21%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-400 to-cyan-500 transition-all duration-500"></div>
-                                </div>
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="text-gray-400">Monthly need: <span class="text-white font-bold">$492</span></span>
-                                    <span class="text-orange-400 flex items-center gap-1">
-                                        <i class="fas fa-exclamation-circle"></i> Adjust needed
-                                    </span>
-                                </div>
-                            </div>
+                    <div id="goals-container" class="space-y-4">
+                        <div class="empty-state py-8">
+                            <i class="fas fa-bullseye text-gray-600"></i>
+                            <h4 class="text-lg font-semibold text-gray-400 mb-2">No goals yet</h4>
+                            <p class="text-sm text-gray-500">Create your first savings goal to start tracking progress</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- AI Advisor Section -->
+                <!-- AI Advisor Empty State -->
                 <div class="glass rounded-2xl p-6 slide-in border border-indigo-500/30 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
                     <div class="flex items-start gap-4">
                         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 floating">
                             <i class="fas fa-robot text-3xl"></i>
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-xl font-bold mb-2 flex items-center gap-2">
-                                AI Financial Advisor
-                                <span class="px-2 py-1 bg-indigo-500/20 rounded-full text-xs text-indigo-300 border border-indigo-500/30">Smart Insights</span>
-                            </h3>
-                            <div id="ai-advice" class="space-y-3">
-                                <div class="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-start gap-3">
+                            <h3 class="text-xl font-bold mb-2">AI Financial Advisor</h3>
+                            <div class="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                                <div class="flex items-start gap-3">
                                     <i class="fas fa-lightbulb text-yellow-400 mt-1"></i>
                                     <div>
-                                        <p class="font-semibold text-indigo-200">Spending Pattern Alert</p>
-                                        <p class="text-sm text-gray-300">You've been spending 15% more on dining out this week. Based on your Japan goal, cutting back $50/week will get you there 2 months early!</p>
-                                    </div>
-                                </div>
-                                <div class="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
-                                    <i class="fas fa-trophy text-yellow-400 mt-1"></i>
-                                    <div>
-                                        <p class="font-semibold text-emerald-200">Streak Opportunity!</p>
-                                        <p class="text-sm text-gray-300">You're $20 under budget today. Log this to maintain your 12-day streak and earn the "Week Warrior" badge!</p>
+                                        <p class="font-semibold text-indigo-200">Welcome to SmartSave!</p>
+                                        <p class="text-sm text-gray-300 mb-3">I'm your AI coach. Once you connect a bank account or add transactions, I'll analyze your spending patterns and provide personalized savings tips.</p>
+                                        <div class="flex gap-2">
+                                            <button onclick="openBankModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-xs transition-colors">
+                                                Connect Bank
+                                            </button>
+                                            <button onclick="document.getElementById('transaction-amount').focus()" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs transition-colors">
+                                                Add Transaction
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <button onclick="generateNewAdvice()" class="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm transition-colors flex items-center gap-2">
-                                <i class="fas fa-sync-alt"></i> Refresh Advice
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Actions & Quick Add -->
+            <!-- Right Column -->
             <div class="space-y-8">
                 
-                <!-- Quick Add Transaction -->
+                <!-- Quick Add (Always visible) -->
                 <div class="glass rounded-2xl p-6 slide-in">
                     <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                         <i class="fas fa-plus-circle text-emerald-400"></i>
@@ -382,100 +442,39 @@
                     </div>
                 </div>
 
-                <!-- Cash Input -->
-                <div class="glass rounded-2xl p-6 slide-in">
-                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-money-bill-wave text-yellow-400"></i>
-                        Cash Entry
-                    </h3>
-                    <p class="text-sm text-gray-400 mb-4">Track cash spending manually</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="quickCash(5)" class="p-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-all font-bold">$5</button>
-                        <button onclick="quickCash(10)" class="p-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-all font-bold">$10</button>
-                        <button onclick="quickCash(20)" class="p-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-all font-bold">$20</button>
-                        <button onclick="quickCash(50)" class="p-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-all font-bold">$50</button>
-                    </div>
-                    <button onclick="openCashModal()" class="w-full mt-3 py-2 border border-dashed border-gray-600 rounded-xl text-gray-400 hover:text-white hover:border-gray-400 transition-all text-sm">
-                        Custom Amount
-                    </button>
-                </div>
-
-                <!-- Recent Activity -->
+                <!-- Recent Activity Empty State -->
                 <div class="glass rounded-2xl p-6 slide-in">
                     <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                         <i class="fas fa-history text-blue-400"></i>
                         Recent Activity
                     </h3>
-                    <div class="space-y-3 max-h-96 overflow-y-auto" id="recent-activity">
-                        <div class="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center">
-                                    <i class="fas fa-coffee text-rose-400"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-sm">Coffee Shop</p>
-                                    <p class="text-xs text-gray-500">2 hours ago</p>
-                                </div>
-                            </div>
-                            <span class="text-rose-400 font-bold">-$5.50</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                                    <i class="fas fa-arrow-down text-emerald-400"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-sm">Salary Deposit</p>
-                                    <p class="text-xs text-gray-500">Yesterday</p>
-                                </div>
-                            </div>
-                            <span class="text-emerald-400 font-bold">+$3,200</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                    <i class="fas fa-shopping-bag text-blue-400"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-sm">Grocery Store</p>
-                                    <p class="text-xs text-gray-500">Yesterday</p>
-                                </div>
-                            </div>
-                            <span class="text-rose-400 font-bold">-$87.23</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors border-2 border-yellow-500/30">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                                    <i class="fas fa-piggy-bank text-yellow-400"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-sm">Japan Trip Fund</p>
-                                    <p class="text-xs text-yellow-500">Auto-saved</p>
-                                </div>
-                            </div>
-                            <span class="text-emerald-400 font-bold">+$100</span>
+                    <div id="recent-activity" class="space-y-3">
+                        <div class="empty-state py-8">
+                            <i class="fas fa-receipt text-gray-600"></i>
+                            <p class="text-sm text-gray-500">No transactions yet</p>
+                            <p class="text-xs text-gray-600 mt-1">Add your first entry above!</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Achievements -->
-                <div class="glass rounded-2xl p-6 slide-in">
+                <!-- Achievements Locked State -->
+                <div class="glass rounded-2xl p-6 slide-in opacity-75">
                     <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                         <i class="fas fa-medal text-yellow-400"></i>
                         Achievements
                     </h3>
                     <div class="grid grid-cols-3 gap-3">
-                        <div class="text-center p-3 rounded-xl bg-gradient-to-b from-yellow-500/20 to-transparent border border-yellow-500/30">
-                            <div class="text-3xl mb-1">🔥</div>
-                            <p class="text-xs font-bold">7 Day Streak</p>
+                        <div class="text-center p-3 rounded-xl bg-gray-800/50 border border-gray-700 opacity-50">
+                            <div class="text-3xl mb-1 grayscale">🔥</div>
+                            <p class="text-xs font-bold text-gray-500">Locked</p>
                         </div>
-                        <div class="text-center p-3 rounded-xl bg-gradient-to-b from-gray-700 to-transparent border border-gray-600 opacity-50">
-                            <div class="text-3xl mb-1">💎</div>
-                            <p class="text-xs font-bold">Super Saver</p>
+                        <div class="text-center p-3 rounded-xl bg-gray-800/50 border border-gray-700 opacity-50">
+                            <div class="text-3xl mb-1 grayscale">💎</div>
+                            <p class="text-xs font-bold text-gray-500">Locked</p>
                         </div>
-                        <div class="text-center p-3 rounded-xl bg-gradient-to-b from-emerald-500/20 to-transparent border border-emerald-500/30">
-                            <div class="text-3xl mb-1">🎯</div>
-                            <p class="text-xs font-bold">Goal Crusher</p>
+                        <div class="text-center p-3 rounded-xl bg-gray-800/50 border border-gray-700 opacity-50">
+                            <div class="text-3xl mb-1 grayscale">🎯</div>
+                            <p class="text-xs font-bold text-gray-500">Locked</p>
                         </div>
                     </div>
                 </div>
@@ -483,12 +482,10 @@
         </div>
     </main>
 
-    <!-- Modals -->
-    
     <!-- New Goal Modal -->
     <div id="goal-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeGoalModal()"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 glass rounded-2xl border border-gray-700">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 glass rounded-2xl border border-gray-700 bg-slate-900">
             <h3 class="text-2xl font-bold mb-4">Create New Goal 🎯</h3>
             <div class="space-y-4">
                 <div>
@@ -506,11 +503,11 @@
                 <div>
                     <label class="block text-sm text-gray-400 mb-2">Icon</label>
                     <div class="grid grid-cols-5 gap-2">
-                        <button onclick="selectIcon('✈️')" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl">✈️</button>
-                        <button onclick="selectIcon('🚗')" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl">🚗</button>
-                        <button onclick="selectIcon('🏠')" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl">🏠</button>
-                        <button onclick="selectIcon('🎓')" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl">🎓</button>
-                        <button onclick="selectIcon('💻')" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl">💻</button>
+                        <button onclick="selectIcon('✈️')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">✈️</button>
+                        <button onclick="selectIcon('🚗')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">🚗</button>
+                        <button onclick="selectIcon('🏠')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">🏠</button>
+                        <button onclick="selectIcon('🎓')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">🎓</button>
+                        <button onclick="selectIcon('💻')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">💻</button>
                     </div>
                 </div>
                 <div class="pt-4 flex gap-3">
@@ -523,7 +520,7 @@
 
     <!-- Notification Toast -->
     <div id="notification" class="fixed bottom-4 right-4 z-50 hidden">
-        <div class="glass rounded-xl p-4 border border-emerald-500/30 flex items-center gap-3 notification">
+        <div class="glass rounded-xl p-4 border border-emerald-500/30 flex items-center gap-3 notification bg-slate-900">
             <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
                 <i class="fas fa-check text-emerald-400"></i>
             </div>
@@ -535,45 +532,367 @@
     </div>
 
     <script>
-        // App State
+        // App State - STARTS AT ZERO
         let currentTransactionType = 'expense';
         let selectedIcon = '✈️';
-        let streakCount = 12;
-        let savings = 4250;
-        
-        // Initialize Charts
-        const ctx = document.getElementById('spendingChart').getContext('2d');
-        const spendingChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Food', 'Shopping', 'Transport', 'Entertainment', 'Others'],
-                datasets: [{
-                    data: [420, 350, 180, 150, 200],
-                    backgroundColor: [
-                        'rgba(244, 63, 94, 0.8)',
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(16, 185, 129, 0.8)',
-                        'rgba(139, 92, 246, 0.8)',
-                        'rgba(107, 114, 128, 0.8)'
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: '#9ca3af', padding: 20, usePointStyle: true }
-                    }
-                },
-                cutout: '70%'
+        let streakCount = 0;
+        let savings = 0;
+        let currentUser = null;
+        let connectedBanks = [];
+        let transactions = [];
+        let goals = [];
+        let spendingChart = null;
+
+        // Smart categorization patterns
+        const categoryPatterns = {
+            food: ['restaurant', 'cafe', 'coffee', 'pizza', 'burger', 'grocery', 'supermarket', 'food', 'dining'],
+            transport: ['uber', 'lyft', 'taxi', 'gas', 'fuel', 'parking', 'transit', 'bus', 'train', 'metro'],
+            shopping: ['amazon', 'walmart', 'target', 'costco', 'best buy', 'apple store', 'clothing', 'shoes'],
+            entertainment: ['netflix', 'spotify', 'cinema', 'movie', 'game', 'steam', 'hulu', 'disney'],
+            bills: ['electric', 'water', 'internet', 'phone', 'rent', 'mortgage', 'insurance', 'subscription']
+        };
+
+        // Auth Functions
+        function switchAuthMode(mode) {
+            const loginTab = document.getElementById('tab-login');
+            const registerTab = document.getElementById('tab-register');
+            const nameField = document.getElementById('name-field');
+            const btnText = document.getElementById('auth-btn-text');
+            
+            if (mode === 'login') {
+                loginTab.className = 'flex-1 py-2 rounded-xl bg-indigo-600 text-white font-semibold transition-all';
+                registerTab.className = 'flex-1 py-2 rounded-xl bg-gray-800 text-gray-400 font-semibold transition-all';
+                nameField.classList.add('hidden');
+                btnText.textContent = 'Login';
+            } else {
+                loginTab.className = 'flex-1 py-2 rounded-xl bg-gray-800 text-gray-400 font-semibold transition-all';
+                registerTab.className = 'flex-1 py-2 rounded-xl bg-indigo-600 text-white font-semibold transition-all';
+                nameField.classList.remove('hidden');
+                btnText.textContent = 'Create Account';
             }
+        }
+
+        document.getElementById('auth-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('user-email').value;
+            const name = document.getElementById('user-name').value || 'Saver';
+            
+            // Simulate authentication
+            currentUser = { email, name, id: Date.now() };
+            localStorage.setItem('smartsave_user', JSON.stringify(currentUser));
+            
+            // Hide demo background and auth modal
+            document.getElementById('demo-background').style.display = 'none';
+            document.getElementById('auth-modal').classList.add('fade-out');
+            
+            setTimeout(() => {
+                document.getElementById('auth-modal').style.display = 'none';
+                document.getElementById('main-content').classList.remove('hidden');
+                document.getElementById('main-nav').classList.remove('hidden');
+                document.getElementById('display-name').textContent = name;
+                document.getElementById('user-initial').textContent = name[0].toUpperCase();
+                
+                // Initialize empty chart
+                initEmptyChart();
+                showNotification('Welcome!', `Your fresh start begins now, ${name}!`, 'success');
+            }, 500);
         });
 
-        // Transaction Type Toggle
+        function logout() {
+            localStorage.removeItem('smartsave_user');
+            location.reload();
+        }
+
+        function initEmptyChart() {
+            const ctx = document.getElementById('spendingChart');
+            if (!ctx) return;
+            
+            const context = ctx.getContext('2d');
+            spendingChart = new Chart(context, {
+                type: 'doughnut',
+                data: {
+                    labels: ['No Data'],
+                    datasets: [{
+                        data: [1],
+                        backgroundColor: ['rgba(75, 85, 99, 0.3)'],
+                        borderWidth: 0,
+                        cutout: '70%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+        }
+
+        function updateChartWithData() {
+            const breakdown = {};
+            transactions.forEach(t => {
+                if (t.type === 'expense') {
+                    breakdown[t.category] = (breakdown[t.category] || 0) + t.amount;
+                }
+            });
+            
+            if (Object.keys(breakdown).length === 0) return;
+            
+            const labels = Object.keys(breakdown).map(c => c.charAt(0).toUpperCase() + c.slice(1));
+            const data = Object.values(breakdown);
+            const colors = [
+                'rgba(244, 63, 94, 0.8)',
+                'rgba(59, 130, 246, 0.8)',
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(139, 92, 246, 0.8)',
+                'rgba(245, 158, 11, 0.8)'
+            ];
+            
+            if (spendingChart) {
+                spendingChart.destroy();
+            }
+            
+            const ctx = document.getElementById('spendingChart').getContext('2d');
+            spendingChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#9ca3af', padding: 20, usePointStyle: true }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+            
+            // Replace empty state with chart
+            document.getElementById('chart-container').innerHTML = '<canvas id="spendingChart"></canvas>';
+            updateCategoryBreakdown();
+        }
+
+        // Bank Functions
+        function openBankModal() {
+            document.getElementById('bank-modal').classList.remove('hidden');
+            document.getElementById('bank-selection').classList.remove('hidden');
+            document.getElementById('bank-login').classList.add('hidden');
+            document.getElementById('bank-loading').classList.add('hidden');
+        }
+
+        function closeBankModal() {
+            document.getElementById('bank-modal').classList.add('hidden');
+        }
+
+        function selectBank(bankName) {
+            document.getElementById('bank-selection').classList.add('hidden');
+            document.getElementById('bank-login').classList.remove('hidden');
+            document.getElementById('bank-login').dataset.bank = bankName;
+        }
+
+        function backToBanks() {
+            document.getElementById('bank-selection').classList.remove('hidden');
+            document.getElementById('bank-login').classList.add('hidden');
+        }
+
+        function connectBank() {
+            const bankName = document.getElementById('bank-login').dataset.bank;
+            document.getElementById('bank-login').classList.add('hidden');
+            document.getElementById('bank-loading').classList.remove('hidden');
+            
+            // Simulate connection steps
+            setTimeout(() => updateStep(1), 800);
+            setTimeout(() => updateStep(2), 1600);
+            setTimeout(() => updateStep(3), 2400);
+            setTimeout(() => {
+                updateStep(4);
+                completeBankConnection(bankName);
+            }, 3200);
+        }
+
+        function updateStep(step) {
+            const steps = ['step-1', 'step-2', 'step-3', 'step-4'];
+            document.getElementById(steps[step-1]).innerHTML = `<i class="fas fa-check-circle text-emerald-400"></i> ${document.getElementById(steps[step-1]).innerText.replace('• ', '')}`;
+        }
+
+        function completeBankConnection(bankName) {
+            const bankId = Date.now();
+            const balance = Math.floor(Math.random() * 5000) + 1000;
+            connectedBanks.push({ id: bankId, name: bankName, balance: balance });
+            
+            // Update savings with initial balance
+            savings += balance;
+            document.getElementById('total-savings').textContent = `$${savings.toLocaleString()}`;
+            
+            // Generate first transactions
+            generateMockTransactions(bankName);
+            
+            setTimeout(() => {
+                closeBankModal();
+                showNotification('Bank Connected!', `${bankName} linked with $${balance.toLocaleString()}`, 'success');
+                createConfetti();
+            }, 1000);
+        }
+
+        function generateMockTransactions(bankName) {
+            const merchants = {
+                food: ['Starbucks', 'Chipotle', 'Whole Foods'],
+                transport: ['Shell', 'Uber'],
+                shopping: ['Amazon', 'Target']
+            };
+            
+            const newTransactions = [];
+            Object.entries(merchants).forEach(([category, merchantList]) => {
+                merchantList.forEach(merchant => {
+                    const amount = (Math.random() * 50 + 10).toFixed(2);
+                    const date = new Date();
+                    date.setDate(date.getDate() - Math.floor(Math.random() * 3));
+                    
+                    newTransactions.push({
+                        id: Date.now() + Math.random(),
+                        merchant,
+                        amount: parseFloat(amount),
+                        category,
+                        date: date.toISOString(),
+                        bank: bankName,
+                        type: 'expense'
+                    });
+                });
+            });
+            
+            transactions = [...newTransactions, ...transactions];
+            updateTransactionsUI();
+            updateChartWithData();
+            updateStreak();
+        }
+
+        function updateStreak() {
+            streakCount = 1;
+            document.getElementById('streak-count').textContent = streakCount;
+            document.getElementById('streak-display').textContent = `${streakCount} Day Streak`;
+            document.querySelector('.fa-fire').classList.remove('opacity-30');
+            document.querySelector('.fa-fire').classList.add('streak-flame', 'text-orange-500');
+        }
+
+        function updateTransactionsUI() {
+            const container = document.getElementById('recent-activity');
+            if (transactions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state py-8">
+                        <i class="fas fa-receipt text-gray-600"></i>
+                        <p class="text-sm text-gray-500">No transactions yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const categoryIcons = {
+                food: 'fa-coffee',
+                shopping: 'fa-shopping-bag',
+                transport: 'fa-bus',
+                entertainment: 'fa-film',
+                bills: 'fa-bolt',
+                others: 'fa-receipt'
+            };
+            
+            const categoryColors = {
+                food: 'rose',
+                shopping: 'blue',
+                transport: 'emerald',
+                entertainment: 'purple',
+                bills: 'yellow',
+                others: 'gray'
+            };
+            
+            container.innerHTML = transactions.slice(0, 5).map(t => {
+                const color = categoryColors[t.category];
+                const icon = categoryIcons[t.category];
+                const timeAgo = getTimeAgo(new Date(t.date));
+                
+                return `
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors slide-in">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-${color}-500/20 flex items-center justify-center">
+                                <i class="fas ${icon} text-${color}-400"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-sm">${t.merchant}</p>
+                                <p class="text-xs text-gray-500">${timeAgo} • <span class="text-${color}-400 capitalize">${t.category}</span></p>
+                            </div>
+                        </div>
+                        <span class="text-rose-400 font-bold">-$${t.amount.toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateCategoryBreakdown() {
+            const container = document.getElementById('category-breakdown');
+            if (!container) return;
+            
+            const breakdown = {};
+            transactions.forEach(t => {
+                if (t.type === 'expense') {
+                    breakdown[t.category] = (breakdown[t.category] || 0) + t.amount;
+                }
+            });
+            
+            const total = Object.values(breakdown).reduce((a, b) => a + b, 0);
+            
+            const colors = {
+                food: { color: 'rose', icon: 'fa-utensils', label: 'Food & Dining' },
+                shopping: { color: 'blue', icon: 'fa-shopping-bag', label: 'Shopping' },
+                transport: { color: 'emerald', icon: 'fa-bus', label: 'Transport' },
+                entertainment: { color: 'purple', icon: 'fa-film', label: 'Entertainment' },
+                bills: { color: 'yellow', icon: 'fa-bolt', label: 'Bills' },
+                others: { color: 'gray', icon: 'fa-receipt', label: 'Others' }
+            };
+            
+            container.innerHTML = Object.entries(breakdown)
+                .sort((a, b) => b[1] - a[1])
+                .map(([cat, amount]) => {
+                    const config = colors[cat];
+                    const percent = ((amount / total) * 100).toFixed(0);
+                    return `
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-gray-800/50 slide-in">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-${config.color}-500/20 flex items-center justify-center">
+                                    <i class="fas ${config.icon} text-${config.color}-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">${config.label}</p>
+                                    <p class="text-xs text-gray-400">${percent}% of spending</p>
+                                </div>
+                            </div>
+                            <span class="font-bold text-${config.color}-400">$${amount.toFixed(0)}</span>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            return `${Math.floor(hours/24)}d ago`;
+        }
+
+        // Transaction Functions
         function setTransactionType(type) {
             currentTransactionType = type;
             const expenseBtn = document.getElementById('btn-expense');
@@ -588,7 +907,6 @@
             }
         }
 
-        // Add Transaction
         function addTransaction() {
             const amount = parseFloat(document.getElementById('transaction-amount').value);
             const category = document.getElementById('transaction-category').value;
@@ -598,106 +916,52 @@
                 return;
             }
 
-            // Simulate adding transaction
-            const categoryIcons = {
-                food: 'fa-coffee',
-                shopping: 'fa-shopping-bag',
-                transport: 'fa-bus',
-                entertainment: 'fa-film',
-                bills: 'fa-bolt',
-                income: 'fa-arrow-down'
-            };
-
-            const categoryColors = {
-                food: 'rose',
-                shopping: 'blue',
-                transport: 'emerald',
-                entertainment: 'purple',
-                bills: 'yellow',
-                income: 'emerald'
-            };
-
             const isIncome = currentTransactionType === 'income';
-            const color = categoryColors[category];
-            const sign = isIncome ? '+' : '-';
+            const merchant = isIncome ? 'Manual Income' : `${category.charAt(0).toUpperCase() + category.slice(1)} Expense`;
             
-            // Add to recent activity
-            const activityHTML = `
-                <div class="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors slide-in">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-${color}-500/20 flex items-center justify-center">
-                            <i class="fas ${categoryIcons[category]} text-${color}-400"></i>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-sm">${category.charAt(0).toUpperCase() + category.slice(1)}</p>
-                            <p class="text-xs text-gray-500">Just now</p>
-                        </div>
-                    </div>
-                    <span class="text-${isIncome ? 'emerald' : 'rose'}-400 font-bold">${sign}$${amount.toFixed(2)}</span>
-                </div>
-            `;
+            transactions.unshift({
+                id: Date.now(),
+                merchant,
+                amount,
+                category,
+                date: new Date().toISOString(),
+                type: currentTransactionType
+            });
             
-            const container = document.getElementById('recent-activity');
-            container.insertAdjacentHTML('afterbegin', activityHTML);
-            
-            // Update savings if income
             if (isIncome) {
                 savings += amount;
                 document.getElementById('total-savings').textContent = `$${savings.toLocaleString()}`;
-                checkStreak();
+            } else {
+                // Update budget progress (simplified)
+                const currentSpent = parseInt(document.getElementById('budget-progress').style.width) || 0;
+                const newWidth = Math.min(currentSpent + 5, 100);
+                document.getElementById('budget-progress').style.width = newWidth + '%';
+                document.getElementById('budget-progress').classList.remove('bg-gray-600');
+                document.getElementById('budget-progress').classList.add('bg-blue-500');
             }
-
-            // Clear input
-            document.getElementById('transaction-amount').value = '';
-            showNotification('Success', 'Transaction added successfully!', 'success');
             
-            // Trigger confetti if it's a savings deposit
-            if (category === 'income') {
+            updateTransactionsUI();
+            updateChartWithData();
+            
+            // First transaction celebration
+            if (transactions.length === 1) {
+                updateStreak();
                 createConfetti();
+                showNotification('First Step!', 'You\'ve started your savings journey!', 'success');
+            } else {
+                showNotification('Success', 'Transaction added!', 'success');
             }
+            
+            document.getElementById('transaction-amount').value = '';
         }
 
-        // Quick Cash Entry
         function quickCash(amount) {
             document.getElementById('transaction-amount').value = amount;
             document.getElementById('transaction-category').value = 'food';
             setTransactionType('expense');
-            showNotification('Cash Entry', `$${amount} ready to log`, 'info');
         }
 
-        // Streak System
-        function checkStreak() {
-            // Simulate streak logic
-            const random = Math.random();
-            if (random > 0.3) {
-                streakCount++;
-                document.getElementById('streak-count').textContent = streakCount;
-                document.getElementById('streak-display').textContent = `${streakCount} Day Streak!`;
-                
-                if (streakCount % 5 === 0) {
-                    createConfetti();
-                    showNotification('🔥 Streak Milestone!', `${streakCount} days! Keep it up!`, 'success');
-                }
-            }
-        }
-
-        // Confetti Effect
-        function createConfetti() {
-            const colors = ['#f43f5e', '#8b5cf6', '#10b981', '#f59e0b', '#3b82f6'];
-            for (let i = 0; i < 50; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                    document.getElementById('confetti-container').appendChild(confetti);
-                    setTimeout(() => confetti.remove(), 4000);
-                }, i * 30);
-            }
-        }
-
-        // Modal Functions
+        // Goal Functions
         function openGoalModal() {
             document.getElementById('goal-modal').classList.remove('hidden');
         }
@@ -708,12 +972,17 @@
 
         function selectIcon(icon) {
             selectedIcon = icon;
-            showNotification('Icon Selected', `${icon} selected for your goal`, 'info');
+            document.querySelectorAll('.icon-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'border-indigo-500');
+                btn.classList.add('bg-gray-800', 'border-transparent');
+            });
+            event.target.classList.remove('bg-gray-800', 'border-transparent');
+            event.target.classList.add('bg-indigo-600', 'border-indigo-500');
         }
 
         function createGoal() {
             const name = document.getElementById('goal-name').value;
-            const amount = document.getElementById('goal-amount').value;
+            const amount = parseFloat(document.getElementById('goal-amount').value);
             const date = document.getElementById('goal-date').value;
             
             if (!name || !amount || !date) {
@@ -723,75 +992,90 @@
 
             const months = Math.ceil((new Date(date) - new Date()) / (1000 * 60 * 60 * 24 * 30));
             const monthlyNeed = (amount / months).toFixed(0);
-
-            const goalHTML = `
-                <div class="p-4 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 relative overflow-hidden group slide-in">
-                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-2xl">
-                                ${selectedIcon}
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-lg">${name}</h4>
-                                <p class="text-sm text-gray-400">Target: ${months} months • $${amount}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-2xl font-bold text-indigo-400">$0</p>
-                            <p class="text-xs text-gray-400">saved</p>
-                        </div>
-                    </div>
-                    <div class="relative pt-1">
-                        <div class="flex mb-2 items-center justify-between">
-                            <div class="text-xs font-semibold text-indigo-400">0% Complete</div>
-                            <div class="text-xs text-gray-400">$${amount} to go</div>
-                        </div>
-                        <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-700">
-                            <div style="width:0%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-indigo-400 to-purple-500 transition-all duration-500"></div>
-                        </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Monthly need: <span class="text-white font-bold">$${monthlyNeed}</span></span>
-                            <span class="text-gray-400 flex items-center gap-1">
-                                <i class="fas fa-clock"></i> Just started
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('goals-container').insertAdjacentHTML('beforeend', goalHTML);
+            const color = ['yellow', 'blue', 'purple', 'pink', 'indigo'][goals.length % 5];
+            
+            const goal = { name, target: amount, saved: 0, icon: selectedIcon, months, color };
+            goals.push(goal);
+            renderGoals();
+            
             closeGoalModal();
             createConfetti();
-            showNotification('Goal Created!', 'Your new savings goal is set!', 'success');
+            showNotification('Goal Created!', 'Your savings journey begins!', 'success');
             
-            // Clear inputs
             document.getElementById('goal-name').value = '';
             document.getElementById('goal-amount').value = '';
             document.getElementById('goal-date').value = '';
         }
 
-        // AI Advisor
-        function generateNewAdvice() {
-            const advices = [
-                { icon: 'fa-piggy-bank', color: 'emerald', title: 'Smart Move Detected', text: 'You spent $30 less on entertainment this week. Redirecting that to your Japan goal could save you 3 weeks!' },
-                { icon: 'fa-chart-line', color: 'blue', title: 'Investment Opportunity', text: 'With your current savings rate, consider putting 10% into a high-yield savings account for extra gains.' },
-                { icon: 'fa-exclamation-triangle', color: 'yellow', title: 'Budget Alert', text: 'You\'re approaching your dining out limit. Cook at home this weekend to stay on track!' },
-                { icon: 'fa-trophy', color: 'purple', title: 'Milestone Coming!', text: 'You\'re 2 days away from a 14-day streak. One more under-budget day unlocks the Gold Saver badge!' }
-            ];
+        function renderGoals() {
+            const container = document.getElementById('goals-container');
+            document.getElementById('active-goals').textContent = goals.length;
             
-            const advice = advices[Math.floor(Math.random() * advices.length)];
-            const html = `
-                <div class="p-3 rounded-lg bg-${advice.color}-500/10 border border-${advice.color}-500/20 flex items-start gap-3 slide-in">
-                    <i class="fas ${advice.icon} text-${advice.color}-400 mt-1"></i>
-                    <div>
-                        <p class="font-semibold text-${advice.color}-200">${advice.title}</p>
-                        <p class="text-sm text-gray-300">${advice.text}</p>
+            if (goals.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state py-8">
+                        <i class="fas fa-bullseye text-gray-600"></i>
+                        <h4 class="text-lg font-semibold text-gray-400 mb-2">No goals yet</h4>
+                        <p class="text-sm text-gray-500">Create your first savings goal to start tracking progress</p>
                     </div>
-                </div>
-            `;
+                `;
+                return;
+            }
             
-            document.getElementById('ai-advice').insertAdjacentHTML('afterbegin', html);
+            container.innerHTML = goals.map((goal) => {
+                const percent = 0;
+                const monthlyNeed = (goal.target / goal.months).toFixed(0);
+                
+                return `
+                    <div class="p-4 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 relative overflow-hidden group slide-in">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-${goal.color}-400 to-${goal.color}-600 flex items-center justify-center text-2xl">
+                                    ${goal.icon}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg">${goal.name}</h4>
+                                    <p class="text-sm text-gray-400">Target: ${goal.months} months • $${goal.target.toLocaleString()}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-2xl font-bold text-${goal.color}-400">$0</p>
+                                <p class="text-xs text-gray-400">saved</p>
+                            </div>
+                        </div>
+                        <div class="relative pt-1">
+                            <div class="flex mb-2 items-center justify-between">
+                                <div class="text-xs font-semibold text-${goal.color}-400">0% Complete</div>
+                                <div class="text-xs text-gray-400">$${goal.target.toLocaleString()} to go</div>
+                            </div>
+                            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-700">
+                                <div style="width:0%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-${goal.color}-400 to-${goal.color}-600 transition-all duration-500"></div>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-400">Monthly need: <span class="text-white font-bold">$${monthlyNeed}</span></span>
+                                <span class="text-gray-400 flex items-center gap-1">
+                                    <i class="fas fa-clock"></i> Just started
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function createConfetti() {
+            const colors = ['#f43f5e', '#8b5cf6', '#10b981', '#f59e0b', '#3b82f6'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.getElementById('confetti-container').appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
+            }
         }
 
         // Notification System
@@ -807,7 +1091,7 @@
             };
             
             const color = colors[type];
-            notif.querySelector('.glass').className = `glass rounded-xl p-4 border border-${color}-500/30 flex items-center gap-3 notification`;
+            notif.querySelector('.glass').className = `glass rounded-xl p-4 border border-${color}-500/30 flex items-center gap-3 notification bg-slate-900`;
             notif.querySelector('i').className = `fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'} text-${color}-400`;
             notifTitle.className = `font-bold text-${color}-400`;
             
@@ -818,27 +1102,20 @@
             setTimeout(() => notif.classList.add('hidden'), 3000);
         }
 
-        function toggleProfile() {
-            showNotification('Profile', 'Profile settings coming soon!', 'info');
-        }
-
-        function openCashModal() {
-            showNotification('Cash Entry', 'Custom cash entry modal - Enter amount in Quick Add', 'info');
-        }
-
-        // Simulate real-time updates
-        setInterval(() => {
-            // Randomly update budget progress slightly to simulate live data
-            const progress = document.getElementById('budget-progress');
-            const currentWidth = parseInt(progress.style.width);
-            if (Math.random() > 0.7 && currentWidth < 95) {
-                progress.style.width = (currentWidth + 1) + '%';
+        // Check auth on load
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('smartsave_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                document.getElementById('demo-background').style.display = 'none';
+                document.getElementById('auth-modal').style.display = 'none';
+                document.getElementById('main-content').classList.remove('hidden');
+                document.getElementById('main-nav').classList.remove('hidden');
+                document.getElementById('display-name').textContent = currentUser.name;
+                document.getElementById('user-initial').textContent = currentUser.name[0].toUpperCase();
+                initEmptyChart();
+                renderGoals();
             }
-        }, 5000);
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            showNotification('Welcome Back!', 'You\'re on a 12-day streak! Keep it up! 🔥', 'success');
         });
     </script>
 </body>
