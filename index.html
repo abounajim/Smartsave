@@ -33,7 +33,7 @@
         .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         
-        /* FIX: Profile dropdown gap issue */
+        /* Profile dropdown fix */
         .profile-menu-container { position: relative; }
         .profile-dropdown {
             position: absolute;
@@ -52,7 +52,6 @@
             visibility: visible;
             transform: translateY(0);
         }
-        /* Invisible bridge to prevent gap */
         .profile-menu-container::after {
             content: '';
             position: absolute;
@@ -62,6 +61,21 @@
             height: 0.5rem;
             background: transparent;
         }
+        
+        /* Alert animations */
+        .alert-breach { animation: alertPulse 1s infinite; border-color: rgba(239, 68, 68, 0.8) !important; }
+        @keyframes alertPulse { 0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); } 50% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.8); } }
+        
+        .progress-bar-striped {
+            background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+            background-size: 1rem 1rem;
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+        @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
+        
+        .smart-advice-card { border-left: 4px solid #10b981; }
+        .smart-warning-card { border-left: 4px solid #f59e0b; }
+        .smart-danger-card { border-left: 4px solid #ef4444; }
     </style>
 </head>
 <body class="text-white min-h-screen overflow-x-hidden">
@@ -69,29 +83,12 @@
     <!-- Confetti Container -->
     <div id="confetti-container"></div>
 
-    <!-- DEMO BACKGROUND (Visible only when logged out) -->
+    <!-- DEMO BACKGROUND -->
     <div id="demo-background" class="demo-bg">
         <div class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto opacity-50">
             <div class="mb-8">
                 <h1 class="text-4xl md:text-5xl font-bold mb-2">Welcome back, <span class="gradient-text">Demo User</span>! 🎯</h1>
                 <p class="text-gray-400 text-lg">Your AI coach has saved you <span class="text-green-400 font-bold">$245</span> this month</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="glass rounded-2xl p-6"><div class="flex justify-between items-start"><div><p class="text-gray-400 text-sm">Total Savings</p><h3 class="text-3xl font-bold text-emerald-400">$12,450</h3></div><i class="fas fa-wallet text-emerald-400 text-xl"></i></div></div>
-                <div class="glass rounded-2xl p-6"><div class="flex justify-between items-start"><div><p class="text-gray-400 text-sm">Monthly Budget</p><h3 class="text-3xl font-bold text-blue-400">$3,500</h3></div><i class="fas fa-calendar-alt text-blue-400 text-xl"></i></div><div class="w-full bg-gray-700 rounded-full h-2 mt-2"><div class="bg-blue-500 h-2 rounded-full" style="width: 65%"></div></div></div>
-                <div class="glass rounded-2xl p-6"><div class="flex justify-between items-start"><div><p class="text-gray-400 text-sm">Active Goals</p><h3 class="text-3xl font-bold text-purple-400">5</h3></div><i class="fas fa-bullseye text-purple-400 text-xl"></i></div></div>
-                <div class="glass rounded-2xl p-6"><div class="flex justify-between items-start"><div><p class="text-gray-400 text-sm">Current Streak</p><h3 class="text-3xl font-bold text-orange-400">24</h3></div><i class="fas fa-fire text-orange-400 text-xl streak-flame"></i></div></div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 glass rounded-2xl p-6 h-96 flex items-center justify-center">
-                    <div class="text-center"><i class="fas fa-chart-pie text-6xl text-gray-600 mb-4"></i><p class="text-gray-500">Demo Analytics Preview</p></div>
-                </div>
-                <div class="space-y-4">
-                    <div class="glass rounded-2xl p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-500/20"></div><div class="flex-1"><div class="h-4 bg-gray-700 rounded w-3/4 mb-2"></div><div class="h-3 bg-gray-800 rounded w-1/2"></div></div></div></div>
-                    <div class="glass rounded-2xl p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-500/20"></div><div class="flex-1"><div class="h-4 bg-gray-700 rounded w-3/4 mb-2"></div><div class="h-3 bg-gray-800 rounded w-1/2"></div></div></div></div>
-                </div>
             </div>
         </div>
     </div>
@@ -104,12 +101,7 @@
                     <i class="fas fa-piggy-bank text-4xl"></i>
                 </div>
                 <h1 class="text-5xl font-bold mb-4 gradient-text">SmartSave AI</h1>
-                <p class="text-xl text-gray-300 mb-6">Your intelligent financial companion that connects to your bank and automatically saves money using AI.</p>
-                <div class="space-y-3 hidden md:block">
-                    <div class="flex items-center gap-3 text-gray-300"><i class="fas fa-check-circle text-emerald-400"></i><span>AI-Powered categorization</span></div>
-                    <div class="flex items-center gap-3 text-gray-300"><i class="fas fa-check-circle text-emerald-400"></i><span>Connect unlimited bank accounts</span></div>
-                    <div class="flex items-center gap-3 text-gray-300"><i class="fas fa-check-circle text-emerald-400"></i><span>Automatic savings recommendations</span></div>
-                </div>
+                <p class="text-xl text-gray-300 mb-6">Your intelligent financial companion with smart budget alerts and daily spending guidance.</p>
             </div>
             
             <div class="glass rounded-3xl p-8 border border-gray-700 shadow-2xl bg-slate-900/80">
@@ -136,93 +128,6 @@
                         <i class="fas fa-arrow-right"></i>
                     </button>
                 </form>
-
-                <div class="mt-6 pt-6 border-t border-gray-700">
-                    <p class="text-center text-sm text-gray-400 mb-4">Secure 256-bit SSL Encryption</p>
-                    <div class="flex justify-center gap-4 text-gray-500">
-                        <i class="fas fa-shield-alt text-2xl"></i>
-                        <i class="fas fa-lock text-2xl"></i>
-                        <i class="fas fa-user-shield text-2xl"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bank Connection Modal -->
-    <div id="bank-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeBankModal()"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl p-6 glass rounded-3xl border border-gray-700 max-h-[90vh] overflow-y-auto bg-slate-900">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="text-2xl font-bold">Connect Your Bank</h3>
-                    <p class="text-gray-400 text-sm">Securely link your accounts for automatic tracking</p>
-                </div>
-                <button onclick="closeBankModal()" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div id="bank-selection">
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    <div onclick="selectBank('Chase')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
-                        <div class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-bold">C</div>
-                        <span class="font-semibold">Chase</span>
-                    </div>
-                    <div onclick="selectBank('Bank of America')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
-                        <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-2xl font-bold">B</div>
-                        <span class="font-semibold">Bank of America</span>
-                    </div>
-                    <div onclick="selectBank('Wells Fargo')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
-                        <div class="w-16 h-16 rounded-full bg-yellow-600 flex items-center justify-center text-2xl font-bold">W</div>
-                        <span class="font-semibold">Wells Fargo</span>
-                    </div>
-                    <div onclick="selectBank('Citibank')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
-                        <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-2xl font-bold">C</div>
-                        <span class="font-semibold">Citibank</span>
-                    </div>
-                    <div onclick="selectBank('Capital One')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
-                        <div class="w-16 h-16 rounded-full bg-blue-800 flex items-center justify-center text-2xl font-bold">C</div>
-                        <span class="font-semibold">Capital One</span>
-                    </div>
-                    <div onclick="selectBank('Other')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
-                        <div class="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-2xl font-bold">+</div>
-                        <span class="font-semibold">Other Banks</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="bank-login" class="hidden space-y-4">
-                <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center gap-3 mb-4">
-                    <i class="fas fa-shield-alt text-indigo-400 text-xl"></i>
-                    <div>
-                        <p class="font-semibold text-indigo-200">Bank-Level Security</p>
-                        <p class="text-sm text-gray-400">We never store your login credentials</p>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">Username</label>
-                    <input type="text" id="bank-username" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="Enter bank username">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">Password</label>
-                    <input type="password" id="bank-password" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="Enter bank password">
-                </div>
-                <button onclick="connectBank()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-link"></i> Connect Securely
-                </button>
-                <button onclick="backToBanks()" class="w-full py-3 border border-gray-600 rounded-xl hover:bg-gray-800 transition-all">Back</button>
-            </div>
-
-            <div id="bank-loading" class="hidden py-12 text-center">
-                <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full sync-spinner mx-auto mb-4"></div>
-                <p class="text-lg font-semibold">Connecting to your bank...</p>
-                <div class="mt-6 space-y-2 text-left max-w-sm mx-auto px-4">
-                    <div class="flex items-center gap-2 text-sm text-gray-400" id="step-1"><i class="fas fa-circle text-gray-600 text-xs"></i> Establishing secure connection</div>
-                    <div class="flex items-center gap-2 text-sm text-gray-400" id="step-2"><i class="fas fa-circle text-gray-600 text-xs"></i> Authenticating credentials</div>
-                    <div class="flex items-center gap-2 text-sm text-gray-400" id="step-3"><i class="fas fa-circle text-gray-600 text-xs"></i> Retrieving transactions</div>
-                    <div class="flex items-center gap-2 text-sm text-gray-400" id="step-4"><i class="fas fa-circle text-gray-600 text-xs"></i> Categorizing with AI</div>
-                </div>
             </div>
         </div>
     </div>
@@ -247,7 +152,6 @@
                             <i class="fas fa-plus"></i> Add Bank
                         </button>
                         
-                        <!-- FIX: Profile menu with proper hover handling -->
                         <div class="profile-menu-container">
                             <button class="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center hover:scale-110 transition-transform">
                                 <span id="user-initial" class="font-bold">U</span>
@@ -255,6 +159,9 @@
                             <div class="profile-dropdown glass rounded-xl border border-gray-700 p-2 bg-slate-900">
                                 <button onclick="openBudgetModal()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 text-white flex items-center gap-2 mb-1">
                                     <i class="fas fa-wallet text-blue-400"></i> Set Budget
+                                </button>
+                                <button onclick="openSavingsGoalModal()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 text-white flex items-center gap-2 mb-1">
+                                    <i class="fas fa-piggy-bank text-emerald-400"></i> Set Savings Goal
                                 </button>
                                 <button onclick="logout()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 text-red-400 flex items-center gap-2">
                                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -271,11 +178,11 @@
     <div id="budget-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeBudgetModal()"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 glass rounded-2xl border border-gray-700 bg-slate-900">
-            <h3 class="text-2xl font-bold mb-4">Set Monthly Budget</h3>
-            <p class="text-gray-400 mb-4">Set a limit to track your spending</p>
+            <h3 class="text-2xl font-bold mb-2">Set Monthly Budget</h3>
+            <p class="text-gray-400 mb-4">I'll alert you at 80% and warn you if you breach it</p>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm text-gray-400 mb-2">Monthly Budget Amount ($)</label>
+                    <label class="block text-sm text-gray-400 mb-2">Monthly Budget ($)</label>
                     <input type="number" id="budget-input" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="2000" min="1">
                 </div>
                 <div class="flex gap-3 pt-2">
@@ -286,33 +193,124 @@
         </div>
     </div>
 
+    <!-- Savings Goal Modal -->
+    <div id="savings-goal-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeSavingsGoalModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 glass rounded-2xl border border-gray-700 bg-slate-900">
+            <h3 class="text-2xl font-bold mb-2">Set Savings Target</h3>
+            <p class="text-gray-400 mb-4">Your daily spending limit will be calculated from this</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Target Savings ($)</label>
+                    <input type="number" id="savings-goal-input" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="500" min="1">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">By End of Month</label>
+                    <input type="date" id="savings-date-input" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button onclick="closeSavingsGoalModal()" class="flex-1 py-3 rounded-xl border border-gray-600 hover:bg-gray-800 transition-all">Cancel</button>
+                    <button onclick="setSavingsGoal()" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl font-bold hover:shadow-lg transition-all">Set Goal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bank Modal -->
+    <div id="bank-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeBankModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl p-6 glass rounded-3xl border border-gray-700 max-h-[90vh] overflow-y-auto bg-slate-900">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Connect Your Bank</h3>
+                <button onclick="closeBankModal()" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="bank-selection" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div onclick="selectBank('Chase')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
+                    <div class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-bold">C</div>
+                    <span class="font-semibold">Chase</span>
+                </div>
+                <div onclick="selectBank('Bank of America')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
+                    <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-2xl font-bold">B</div>
+                    <span class="font-semibold">Bank of America</span>
+                </div>
+                <div onclick="selectBank('Wells Fargo')" class="bank-card glass p-4 rounded-2xl border border-gray-700 flex flex-col items-center gap-3 hover:bg-gray-800">
+                    <div class="w-16 h-16 rounded-full bg-yellow-600 flex items-center justify-center text-2xl font-bold">W</div>
+                    <span class="font-semibold">Wells Fargo</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto hidden" id="main-content">
         
+        <!-- Smart Alert Banner -->
+        <div id="smart-alert-banner" class="hidden mb-6 glass rounded-2xl p-4 border-l-4 slide-in">
+            <div class="flex items-start gap-3">
+                <i id="alert-icon" class="fas fa-exclamation-triangle text-2xl mt-1"></i>
+                <div class="flex-1">
+                    <h4 id="alert-title" class="font-bold text-lg mb-1">Smart Alert</h4>
+                    <p id="alert-message" class="text-sm text-gray-300 mb-2">Message here</p>
+                    <p id="alert-advice" class="text-xs text-emerald-400 font-semibold">Advice here</p>
+                </div>
+                <button onclick="dismissAlert()" class="text-gray-500 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <!-- Daily Limit Card -->
+        <div id="daily-limit-card" class="hidden mb-6 glass rounded-2xl p-4 border border-indigo-500/30 bg-indigo-900/10 slide-in">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                        <i class="fas fa-calculator text-indigo-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Daily Spending Limit</p>
+                        <h3 class="text-2xl font-bold text-indigo-400" id="daily-limit-amount">$0</h3>
+                        <p class="text-xs text-gray-500" id="days-remaining">to reach your goal</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-400">Spent Today</p>
+                    <h3 class="text-2xl font-bold" id="spent-today">$0</h3>
+                    <p class="text-xs" id="daily-status">On track</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Welcome -->
         <div class="mb-8 text-center slide-in">
             <h1 class="text-4xl md:text-5xl font-bold mb-2">Welcome, <span class="gradient-text" id="display-name">Saver</span>! 🎉</h1>
-            <p class="text-gray-400 text-lg">Start your savings journey by connecting a bank or adding your first transaction</p>
+            <p class="text-gray-400 text-lg" id="smart-subtitle">Start by setting your budget and savings goal</p>
         </div>
 
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Savings -->
-            <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
+            <!-- Total Savings with Chart -->
+            <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden lg:col-span-2">
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Total Savings</p>
                         <h3 class="text-3xl font-bold text-emerald-400" id="total-savings">$0</h3>
+                        <p class="text-sm mt-1" id="savings-goal-text">Goal: Not set</p>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                        <i class="fas fa-wallet text-emerald-400 text-xl"></i>
+                        <i class="fas fa-piggy-bank text-emerald-400 text-xl"></i>
                     </div>
                 </div>
-                <p class="text-sm text-gray-500" id="savings-subtext">Start saving to see growth</p>
+                
+                <!-- Mini Savings Chart -->
+                <div class="h-24 mt-4" id="savings-chart-container">
+                    <div class="empty-state h-full flex items-center justify-center">
+                        <p class="text-xs text-gray-500">Set a savings goal to see progress</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Monthly Budget -->
-            <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden cursor-pointer" onclick="openBudgetModal()">
+            <!-- Budget -->
+            <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden cursor-pointer" onclick="openBudgetModal()" id="budget-card">
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Monthly Budget</p>
@@ -322,24 +320,10 @@
                         <i class="fas fa-calendar-alt text-blue-400 text-xl"></i>
                     </div>
                 </div>
-                <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
-                    <div class="bg-gray-600 h-2 rounded-full transition-all duration-500" style="width: 0%" id="budget-progress"></div>
+                <div class="w-full bg-gray-700 rounded-full h-3 mt-2 overflow-hidden">
+                    <div class="bg-gray-600 h-3 rounded-full transition-all duration-500" style="width: 0%" id="budget-progress"></div>
                 </div>
-                <p class="text-xs text-gray-400 mt-2" id="budget-text">Click to set your monthly budget</p>
-            </div>
-
-            <!-- Active Goals -->
-            <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <p class="text-gray-400 text-sm mb-1">Active Goals</p>
-                        <h3 class="text-3xl font-bold text-purple-400" id="active-goals">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                        <i class="fas fa-bullseye text-purple-400 text-xl"></i>
-                    </div>
-                </div>
-                <p class="text-sm text-gray-500">No active goals yet</p>
+                <p class="text-xs text-gray-400 mt-2" id="budget-text">Click to set budget</p>
             </div>
 
             <!-- Streak -->
@@ -356,25 +340,20 @@
                         <i class="fas fa-trophy text-orange-400 text-xl"></i>
                     </div>
                 </div>
-                <p class="text-sm text-gray-400">Start logging to build streaks!</p>
+                <p class="text-sm text-gray-400">Keep logging daily!</p>
             </div>
         </div>
 
-        <!-- CTA -->
-        <div class="mb-8 glass rounded-2xl p-8 border border-indigo-500/30 relative overflow-hidden bg-gradient-to-br from-indigo-900/20 to-purple-900/20 slide-in">
-            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 pulse-glow">
-                        <i class="fas fa-rocket text-3xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold mb-1">Ready to start saving?</h3>
-                        <p class="text-gray-400">Connect your bank account for automatic tracking</p>
-                    </div>
+        <!-- Smart Insights -->
+        <div class="mb-8 glass rounded-2xl p-6 border border-indigo-500/30 slide-in" id="smart-insights">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-brain text-indigo-400"></i>
+                Smart Insights
+            </h3>
+            <div id="insights-container" class="space-y-3">
+                <div class="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                    <p class="text-sm text-gray-300">Set your budget and savings goal to get personalized daily spending limits and smart alerts.</p>
                 </div>
-                <button onclick="openBankModal()" class="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-bold hover:shadow-lg hover:shadow-indigo-500/30 transition-all flex items-center gap-2 whitespace-nowrap">
-                    <i class="fas fa-link"></i> Connect First Bank
-                </button>
             </div>
         </div>
 
@@ -399,7 +378,7 @@
                                 <div class="empty-state text-center">
                                     <i class="fas fa-chart-pie text-4xl text-gray-600 mb-3"></i>
                                     <h4 class="text-lg font-semibold text-gray-400 mb-2">No data yet</h4>
-                                    <p class="text-sm text-gray-500 mb-4">Add a transaction to see analytics</p>
+                                    <p class="text-sm text-gray-500 mb-4">Add transactions to see analytics</p>
                                 </div>
                             </div>
                         </div>
@@ -420,30 +399,11 @@
                             <i class="fas fa-bullseye text-pink-400"></i>
                             Savings Goals
                         </h3>
-                        <button onclick="openGoalModal()" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg hover:shadow-lg hover:shadow-indigo-500/30 transition-all flex items-center gap-2">
-                            <i class="fas fa-plus"></i> New Goal
-                        </button>
                     </div>
                     <div id="goals-container" class="space-y-4">
                         <div class="empty-state py-8">
                             <i class="fas fa-bullseye text-gray-600"></i>
-                            <h4 class="text-lg font-semibold text-gray-400 mb-2">No goals yet</h4>
-                            <p class="text-sm text-gray-500">Create your first savings goal</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI Advisor -->
-                <div class="glass rounded-2xl p-6 slide-in border border-indigo-500/30 relative overflow-hidden">
-                    <div class="flex items-start gap-4">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 floating">
-                            <i class="fas fa-robot text-3xl"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="text-xl font-bold mb-2">AI Financial Advisor</h3>
-                            <div class="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
-                                <p class="text-sm text-gray-300">Connect a bank or add transactions to get AI insights.</p>
-                            </div>
+                            <p class="text-sm text-gray-500">No goals yet</p>
                         </div>
                     </div>
                 </div>
@@ -515,42 +475,6 @@
         </div>
     </main>
 
-    <!-- Goal Modal -->
-    <div id="goal-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeGoalModal()"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 glass rounded-2xl border border-gray-700 bg-slate-900">
-            <h3 class="text-2xl font-bold mb-4">Create New Goal 🎯</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">Goal Name</label>
-                    <input type="text" id="goal-name" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="e.g., New Laptop">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">Target Amount ($)</label>
-                    <input type="number" id="goal-amount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="1000">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">Target Date</label>
-                    <input type="date" id="goal-date" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">Icon</label>
-                    <div class="grid grid-cols-5 gap-2">
-                        <button onclick="selectIcon('✈️')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">✈️</button>
-                        <button onclick="selectIcon('🚗')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">🚗</button>
-                        <button onclick="selectIcon('🏠')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">🏠</button>
-                        <button onclick="selectIcon('🎓')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">🎓</button>
-                        <button onclick="selectIcon('💻')" class="icon-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-2xl border border-transparent">💻</button>
-                    </div>
-                </div>
-                <div class="pt-4 flex gap-3">
-                    <button onclick="closeGoalModal()" class="flex-1 py-3 rounded-xl border border-gray-600 hover:bg-gray-800 transition-all">Cancel</button>
-                    <button onclick="createGoal()" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-bold hover:shadow-lg transition-all">Create Goal</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Notification -->
     <div id="notification" class="fixed bottom-4 right-4 z-50 hidden">
         <div class="glass rounded-xl p-4 border border-emerald-500/30 flex items-center gap-3 notification bg-slate-900">
@@ -559,7 +483,7 @@
             </div>
             <div>
                 <p class="font-bold text-emerald-400" id="notif-title">Success!</p>
-                <p class="text-sm text-gray-300" id="notif-message">Transaction added successfully</p>
+                <p class="text-sm text-gray-300" id="notif-message">Done</p>
             </div>
         </div>
     </div>
@@ -575,31 +499,35 @@
         let transactions = [];
         let goals = [];
         let spendingChart = null;
+        let savingsChart = null;
         let monthlyBudget = 0;
         let budgetSpent = 0;
-
-        // Category patterns
-        const categoryPatterns = {
-            food: ['restaurant', 'cafe', 'coffee', 'pizza', 'burger', 'grocery', 'supermarket', 'food', 'dining'],
-            transport: ['uber', 'lyft', 'taxi', 'gas', 'fuel', 'parking', 'transit', 'bus', 'train', 'metro'],
-            shopping: ['amazon', 'walmart', 'target', 'costco', 'best buy', 'apple store', 'clothing', 'shoes'],
-            entertainment: ['netflix', 'spotify', 'cinema', 'movie', 'game', 'steam', 'hulu', 'disney'],
-            bills: ['electric', 'water', 'internet', 'phone', 'rent', 'mortgage', 'insurance', 'subscription']
-        };
+        let savingsGoal = { amount: 0, deadline: null, dailyLimit: 0 };
+        let alertShown = { eighty: false, breached: false };
 
         function initDatePicker() {
             const today = new Date().toISOString().split('T')[0];
             const dateInput = document.getElementById('transaction-date');
+            const savingsDateInput = document.getElementById('savings-date-input');
+            
             if (dateInput) {
                 dateInput.value = today;
                 dateInput.max = today;
+            }
+            
+            // Set savings date to end of current month
+            if (savingsDateInput) {
+                const lastDay = new Date();
+                lastDay.setMonth(lastDay.getMonth() + 1);
+                lastDay.setDate(0);
+                savingsDateInput.value = lastDay.toISOString().split('T')[0];
+                savingsDateInput.min = today;
             }
         }
 
         // Budget Functions
         function openBudgetModal() {
             document.getElementById('budget-modal').classList.remove('hidden');
-            document.getElementById('budget-input').value = monthlyBudget > 0 ? monthlyBudget : '';
             document.getElementById('budget-input').focus();
         }
 
@@ -616,27 +544,291 @@
             
             monthlyBudget = amount;
             updateBudgetDisplay();
+            calculateDailyLimit();
             closeBudgetModal();
-            showNotification('Budget Set', `Monthly budget set to $${monthlyBudget.toLocaleString()}`, 'success');
+            showNotification('Budget Set', `Monthly budget: $${monthlyBudget.toLocaleString()}`, 'success');
+            generateSmartInsights();
+        }
+
+        // Savings Goal Functions
+        function openSavingsGoalModal() {
+            document.getElementById('savings-goal-modal').classList.remove('hidden');
+            document.getElementById('savings-goal-input').focus();
+        }
+
+        function closeSavingsGoalModal() {
+            document.getElementById('savings-goal-modal').classList.add('hidden');
+        }
+
+        function setSavingsGoal() {
+            const amount = parseFloat(document.getElementById('savings-goal-input').value);
+            const deadline = document.getElementById('savings-date-input').value;
+            
+            if (!amount || amount <= 0) {
+                showNotification('Error', 'Please enter a valid savings goal', 'error');
+                return;
+            }
+            
+            savingsGoal = { amount, deadline, dailyLimit: 0 };
+            calculateDailyLimit();
+            updateSavingsDisplay();
+            closeSavingsGoalModal();
+            showNotification('Goal Set', `Save $${amount.toLocaleString()} by ${new Date(deadline).toLocaleDateString()}`, 'success');
+            generateSmartInsights();
+        }
+
+        function calculateDailyLimit() {
+            if (!savingsGoal.amount || !savingsGoal.deadline || monthlyBudget <= 0) {
+                document.getElementById('daily-limit-card').classList.add('hidden');
+                return;
+            }
+            
+            const today = new Date();
+            const deadline = new Date(savingsGoal.deadline);
+            const daysLeft = Math.max(1, Math.ceil((deadline - today) / (1000 * 60 * 60 * 24)));
+            
+            // Daily spending limit = (Monthly Budget - Savings Goal) / Days left in month
+            const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+            const daysRemaining = Math.max(1, daysInMonth - today.getDate() + 1);
+            
+            // Must save this much per day
+            const dailySavingsRequired = savingsGoal.amount / daysLeft;
+            
+            // Can spend this much per day
+            const dailySpendLimit = Math.max(0, (monthlyBudget - budgetSpent) / daysRemaining - dailySavingsRequired);
+            
+            savingsGoal.dailyLimit = dailySpendLimit;
+            
+            // Show daily limit card
+            document.getElementById('daily-limit-card').classList.remove('hidden');
+            document.getElementById('daily-limit-amount').textContent = `$${dailySpendLimit.toFixed(0)}`;
+            document.getElementById('days-remaining').textContent = `${daysLeft} days to save $${savingsGoal.amount.toLocaleString()}`;
+            
+            updateDailySpending();
+        }
+
+        function updateDailySpending() {
+            const today = new Date().toDateString();
+            const spentToday = transactions
+                .filter(t => t.type === 'expense' && new Date(t.date).toDateString() === today)
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            document.getElementById('spent-today').textContent = `$${spentToday.toFixed(2)}`;
+            
+            const statusEl = document.getElementById('daily-status');
+            if (savingsGoal.dailyLimit > 0) {
+                const percent = (spentToday / savingsGoal.dailyLimit) * 100;
+                if (percent > 100) {
+                    statusEl.textContent = '⚠️ Over limit!';
+                    statusEl.className = 'text-xs text-red-400 font-bold';
+                } else if (percent > 80) {
+                    statusEl.textContent = '⚡ Approaching limit';
+                    statusEl.className = 'text-xs text-yellow-400';
+                } else {
+                    statusEl.textContent = '✅ On track';
+                    statusEl.className = 'text-xs text-emerald-400';
+                }
+            }
+        }
+
+        // Smart Alert System
+        function checkBudgetAlerts() {
+            if (monthlyBudget <= 0) return;
+            
+            const percentUsed = (budgetSpent / monthlyBudget) * 100;
+            const banner = document.getElementById('smart-alert-banner');
+            const title = document.getElementById('alert-title');
+            const message = document.getElementById('alert-message');
+            const advice = document.getElementById('alert-advice');
+            const icon = document.getElementById('alert-icon');
+            
+            // 80% Warning (show once)
+            if (percentUsed >= 80 && percentUsed < 100 && !alertShown.eighty) {
+                alertShown.eighty = true;
+                banner.classList.remove('hidden', 'alert-breach');
+                banner.classList.add('smart-warning-card');
+                banner.style.borderLeftColor = '#f59e0b';
+                icon.className = 'fas fa-exclamation-triangle text-2xl mt-1 text-yellow-400';
+                title.textContent = '⚠️ Budget Alert: 80% Used';
+                title.className = 'font-bold text-lg mb-1 text-yellow-400';
+                message.textContent = `You've spent $${budgetSpent.toFixed(2)} of your $${monthlyBudget.toLocaleString()} monthly budget.`;
+                advice.textContent = `Daily limit reduced to $${(savingsGoal.dailyLimit * 0.5).toFixed(0)}. Consider pausing non-essential spending.`;
+                showNotification('Budget Warning', 'You\'ve reached 80% of your budget!', 'error');
+            }
+            
+            // 100% Breach (show every time)
+            if (percentUsed >= 100) {
+                banner.classList.remove('hidden');
+                banner.classList.add('alert-breach');
+                banner.style.borderLeftColor = '#ef4444';
+                icon.className = 'fas fa-ban text-2xl mt-1 text-red-400';
+                title.textContent = '🚨 BUDGET BREACHED!';
+                title.className = 'font-bold text-lg mb-1 text-red-400';
+                message.textContent = `You've exceeded your $${monthlyBudget.toLocaleString()} budget by $${(budgetSpent - monthlyBudget).toFixed(2)}!`;
+                
+                const overspend = budgetSpent - monthlyBudget;
+                const daysLeft = Math.max(1, new Date(savingsGoal.deadline || new Date().setMonth(new Date().getMonth() + 1)) - new Date()) / (1000 * 60 * 60 * 24);
+                advice.textContent = `URGENT: Cut spending by $${(overspend / daysLeft + savingsGoal.dailyLimit).toFixed(0)}/day to recover. Avoid all non-essential purchases!`;
+                
+                if (!alertShown.breached) {
+                    alertShown.breached = true;
+                    showNotification('BUDGET BREACHED!', 'Stop spending immediately!', 'error');
+                    createConfetti();
+                }
+            }
+        }
+
+        function dismissAlert() {
+            document.getElementById('smart-alert-banner').classList.add('hidden');
+        }
+
+        // Generate Smart Insights
+        function generateSmartInsights() {
+            const container = document.getElementById('insights-container');
+            const insights = [];
+            
+            if (monthlyBudget > 0 && savingsGoal.amount > 0) {
+                const daysLeft = Math.max(1, Math.ceil((new Date(savingsGoal.deadline) - new Date()) / (1000 * 60 * 60 * 24)));
+                const dailySave = savingsGoal.amount / daysLeft;
+                const dailySpend = savingsGoal.dailyLimit;
+                
+                insights.push({
+                    type: 'success',
+                    icon: 'fa-lightbulb',
+                    title: 'Smart Daily Plan',
+                    text: `Save $${dailySave.toFixed(0)}/day and spend max $${dailySpend.toFixed(0)}/day to hit your goal.`
+                });
+                
+                if (budgetSpent > monthlyBudget * 0.5) {
+                    const pace = (budgetSpent / (new Date().getDate())) * 30;
+                    if (pace > monthlyBudget) {
+                        insights.push({
+                            type: 'warning',
+                            icon: 'fa-chart-line',
+                            title: 'Spending Pace Alert',
+                            text: `At this pace, you'll spend $${pace.toFixed(0)} this month. Cut back to stay under $${monthlyBudget}!`
+                        });
+                    }
+                }
+            } else if (monthlyBudget > 0) {
+                insights.push({
+                    type: 'info',
+                    icon: 'fa-piggy-bank',
+                    title: 'Pro Tip',
+                    text: 'Set a savings goal to get a personalized daily spending limit and track your progress!'
+                });
+            }
+            
+            if (insights.length === 0) {
+                insights.push({
+                    type: 'info',
+                    icon: 'fa-info-circle',
+                    title: 'Get Started',
+                    text: 'Set your monthly budget and savings goal to unlock smart spending insights and alerts.'
+                });
+            }
+            
+            container.innerHTML = insights.map(i => `
+                <div class="p-3 rounded-lg ${i.type === 'warning' ? 'bg-yellow-500/10 border border-yellow-500/30' : i.type === 'success' ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-indigo-500/10 border border-indigo-500/30'} flex items-start gap-3 slide-in">
+                    <i class="fas ${i.icon} ${i.type === 'warning' ? 'text-yellow-400' : i.type === 'success' ? 'text-emerald-400' : 'text-indigo-400'} mt-1"></i>
+                    <div>
+                        <p class="font-semibold ${i.type === 'warning' ? 'text-yellow-200' : i.type === 'success' ? 'text-emerald-200' : 'text-indigo-200'}">${i.title}</p>
+                        <p class="text-sm text-gray-300">${i.text}</p>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function updateBudgetDisplay() {
             const budgetEl = document.getElementById('monthly-budget');
             const progressEl = document.getElementById('budget-progress');
             const textEl = document.getElementById('budget-text');
+            const card = document.getElementById('budget-card');
             
             if (monthlyBudget > 0) {
                 budgetEl.textContent = `$${monthlyBudget.toLocaleString()}`;
                 const percent = Math.min((budgetSpent / monthlyBudget) * 100, 100);
                 progressEl.style.width = percent + '%';
                 
-                // Color based on usage
-                progressEl.className = 'h-2 rounded-full transition-all duration-500 ' + 
-                    (percent > 90 ? 'bg-red-500' : percent > 75 ? 'bg-yellow-500' : 'bg-blue-500');
+                // Color coding
+                if (percent >= 100) {
+                    progressEl.className = 'h-3 rounded-full transition-all duration-500 bg-red-500 progress-bar-striped';
+                    card.classList.add('alert-breach');
+                } else if (percent >= 80) {
+                    progressEl.className = 'h-3 rounded-full transition-all duration-500 bg-yellow-500';
+                    card.classList.remove('alert-breach');
+                } else {
+                    progressEl.className = 'h-3 rounded-full transition-all duration-500 bg-blue-500';
+                    card.classList.remove('alert-breach');
+                }
                 
                 const remaining = monthlyBudget - budgetSpent;
                 textEl.textContent = `$${budgetSpent.toLocaleString()} spent • $${remaining.toLocaleString()} left`;
+                textEl.className = remaining < 0 ? 'text-xs text-red-400 font-bold' : 'text-xs text-gray-400';
             }
+            
+            checkBudgetAlerts();
+        }
+
+        function updateSavingsDisplay() {
+            const savingsEl = document.getElementById('total-savings');
+            const goalText = document.getElementById('savings-goal-text');
+            
+            savingsEl.textContent = `$${savings.toLocaleString()}`;
+            
+            if (savingsGoal.amount > 0) {
+                const percent = Math.min((savings / savingsGoal.amount) * 100, 100);
+                goalText.textContent = `Goal: $${savingsGoal.amount.toLocaleString()} (${percent.toFixed(0)}%)`;
+                goalText.className = 'text-sm mt-1 ' + (percent >= 100 ? 'text-emerald-400 font-bold' : 'text-gray-400');
+                
+                // Update mini chart
+                updateSavingsChart(percent);
+            } else {
+                goalText.textContent = 'Goal: Not set';
+                goalText.className = 'text-sm mt-1 text-gray-500';
+            }
+        }
+
+        function updateSavingsChart(percent) {
+            const container = document.getElementById('savings-chart-container');
+            
+            if (savingsChart) {
+                savingsChart.destroy();
+            }
+            
+            container.innerHTML = '<canvas id="savingsChart"></canvas>';
+            const ctx = document.getElementById('savingsChart').getContext('2d');
+            
+            savingsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Saved', 'Remaining'],
+                    datasets: [{
+                        data: [percent, 100 - percent],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(75, 85, 99, 0.3)'
+                        ],
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { display: false, max: 100 },
+                        y: { 
+                            ticks: { color: '#9ca3af', font: { size: 10 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
         }
 
         // Auth
@@ -678,7 +870,7 @@
                 document.getElementById('user-initial').textContent = name[0].toUpperCase();
                 
                 initDatePicker();
-                showNotification('Welcome!', `Your fresh start begins now, ${name}!`, 'success');
+                showNotification('Welcome!', `Your smart savings journey begins, ${name}!`, 'success');
             }, 500);
         });
 
@@ -783,9 +975,6 @@
         // Bank Functions
         function openBankModal() {
             document.getElementById('bank-modal').classList.remove('hidden');
-            document.getElementById('bank-selection').classList.remove('hidden');
-            document.getElementById('bank-login').classList.add('hidden');
-            document.getElementById('bank-loading').classList.add('hidden');
         }
 
         function closeBankModal() {
@@ -793,107 +982,108 @@
         }
 
         function selectBank(bankName) {
-            document.getElementById('bank-selection').classList.add('hidden');
-            document.getElementById('bank-login').classList.remove('hidden');
-            document.getElementById('bank-login').dataset.bank = bankName;
-        }
-
-        function backToBanks() {
-            document.getElementById('bank-selection').classList.remove('hidden');
-            document.getElementById('bank-login').classList.add('hidden');
-        }
-
-        function connectBank() {
-            const bankName = document.getElementById('bank-login').dataset.bank;
-            document.getElementById('bank-login').classList.add('hidden');
-            document.getElementById('bank-loading').classList.remove('hidden');
-            
-            setTimeout(() => updateStep(1), 800);
-            setTimeout(() => updateStep(2), 1600);
-            setTimeout(() => updateStep(3), 2400);
+            // Simulate connection
             setTimeout(() => {
-                updateStep(4);
-                completeBankConnection(bankName);
-            }, 3200);
-        }
-
-        function updateStep(step) {
-            const steps = ['step-1', 'step-2', 'step-3', 'step-4'];
-            document.getElementById(steps[step-1]).innerHTML = `<i class="fas fa-check-circle text-emerald-400"></i> ${document.getElementById(steps[step-1]).innerText.replace('• ', '')}`;
-        }
-
-        function completeBankConnection(bankName) {
-            const bankId = Date.now();
-            const balance = Math.floor(Math.random() * 5000) + 1000;
-            connectedBanks.push({ id: bankId, name: bankName, balance: balance });
-            
-            // Income increases savings
-            savings += balance;
-            updateSavingsDisplay();
-            
-            generateMockTransactions(bankName);
-            
-            setTimeout(() => {
+                const balance = Math.floor(Math.random() * 5000) + 1000;
+                savings += balance;
+                updateSavingsDisplay();
+                
+                showNotification('Bank Connected!', `${bankName}: $${balance.toLocaleString()}`, 'success');
                 closeBankModal();
-                showNotification('Bank Connected!', `${bankName} linked with $${balance.toLocaleString()}`, 'success');
                 createConfetti();
             }, 1000);
         }
 
-        function updateSavingsDisplay() {
-            document.getElementById('total-savings').textContent = `$${savings.toLocaleString()}`;
-            const subtext = document.getElementById('savings-subtext');
-            if (savings > 0) {
-                subtext.textContent = 'Keep building your wealth!';
-                subtext.className = 'text-sm text-emerald-500';
+        function createConfetti() {
+            const colors = ['#f43f5e', '#8b5cf6', '#10b981', '#f59e0b', '#3b82f6'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.getElementById('confetti-container').appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
             }
         }
 
-        function generateMockTransactions(bankName) {
-            const merchants = {
-                food: ['Starbucks', 'Chipotle', 'Whole Foods'],
-                transport: ['Shell', 'Uber'],
-                shopping: ['Amazon', 'Target']
-            };
+        // Transaction Functions
+        function setTransactionType(type) {
+            currentTransactionType = type;
+            const expenseBtn = document.getElementById('btn-expense');
+            const incomeBtn = document.getElementById('btn-income');
             
-            const newTransactions = [];
-            Object.entries(merchants).forEach(([category, merchantList]) => {
-                merchantList.forEach(merchant => {
-                    const amount = (Math.random() * 50 + 10).toFixed(2);
-                    const date = new Date();
-                    date.setDate(date.getDate() - Math.floor(Math.random() * 3));
-                    
-                    newTransactions.push({
-                        id: Date.now() + Math.random(),
-                        merchant,
-                        amount: parseFloat(amount),
-                        category,
-                        date: date.toISOString(),
-                        bank: bankName,
-                        type: 'expense'
-                    });
-                    
-                    // Expenses affect budget, NOT savings
-                    budgetSpent += parseFloat(amount);
-                });
+            if (type === 'expense') {
+                expenseBtn.className = 'py-2 rounded-lg bg-rose-500/20 border border-rose-500 text-rose-400 font-semibold transition-all';
+                incomeBtn.className = 'py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-400 font-semibold transition-all';
+            } else {
+                expenseBtn.className = 'py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-400 font-semibold transition-all';
+                incomeBtn.className = 'py-2 rounded-lg bg-emerald-500/20 border border-emerald-500 text-emerald-400 font-semibold transition-all';
+            }
+        }
+
+        function addTransaction() {
+            const amount = parseFloat(document.getElementById('transaction-amount').value);
+            const category = document.getElementById('transaction-category').value;
+            const dateInput = document.getElementById('transaction-date').value;
+            
+            if (!amount || amount <= 0) {
+                showNotification('Error', 'Please enter a valid amount', 'error');
+                return;
+            }
+
+            const isIncome = currentTransactionType === 'income';
+            const merchant = isIncome ? 'Manual Income' : `${category.charAt(0).toUpperCase() + category.slice(1)} Expense`;
+            const transactionDate = dateInput ? new Date(dateInput) : new Date();
+            
+            transactions.unshift({
+                id: Date.now(),
+                merchant,
+                amount,
+                category,
+                date: transactionDate.toISOString(),
+                type: currentTransactionType
             });
             
-            transactions = [...newTransactions, ...transactions];
-            updateBudgetDisplay();
+            if (isIncome) {
+                savings += amount;
+                updateSavingsDisplay();
+            } else {
+                savings -= amount;
+                updateSavingsDisplay();
+                budgetSpent += amount;
+                updateBudgetDisplay();
+                updateDailySpending();
+                
+                // Check if this expense breaches daily limit
+                if (savingsGoal.dailyLimit > 0) {
+                    const today = new Date().toDateString();
+                    const spentToday = transactions
+                        .filter(t => t.type === 'expense' && new Date(t.date).toDateString() === today)
+                        .reduce((sum, t) => sum + t.amount, 0);
+                    
+                    if (spentToday > savingsGoal.dailyLimit && spentToday - amount <= savingsGoal.dailyLimit) {
+                        showNotification('Daily Limit Exceeded!', `You've spent $${spentToday.toFixed(2)} today. Limit was $${savingsGoal.dailyLimit.toFixed(0)}`, 'error');
+                    }
+                }
+            }
+            
             updateTransactionsUI();
             updateChartWithData();
-            updateStreak();
-        }
-
-        function updateStreak() {
-            streakCount = 1;
-            document.getElementById('streak-count').textContent = streakCount;
-            document.getElementById('streak-display').textContent = `${streakCount} Day Streak`;
-            const fireIcon = document.querySelector('.fa-fire');
-            if (fireIcon) {
-                fireIcon.classList.remove('opacity-30');
-                fireIcon.classList.add('streak-flame', 'text-orange-500');
+            generateSmartInsights();
+            
+            if (transactions.length === 1) {
+                updateStreak();
+                createConfetti();
+                showNotification('First Step!', 'You\'ve started your savings journey!', 'success');
+            } else {
+                showNotification('Success', 'Transaction added!', 'success');
             }
+            
+            document.getElementById('transaction-amount').value = '';
+            initDatePicker();
         }
 
         function updateTransactionsUI() {
@@ -943,191 +1133,20 @@
                                 <p class="text-xs text-gray-500">${dateStr} • <span class="text-${color}-400 capitalize">${t.category}</span></p>
                             </div>
                         </div>
-                        <span class="text-rose-400 font-bold">-$${t.amount.toFixed(2)}</span>
+                        <span class="${t.type === 'income' ? 'text-emerald-400' : 'text-rose-400'} font-bold">${t.type === 'income' ? '+' : '-'}$${t.amount.toFixed(2)}</span>
                     </div>
                 `;
             }).join('');
         }
 
-        // Transaction Functions
-        function setTransactionType(type) {
-            currentTransactionType = type;
-            const expenseBtn = document.getElementById('btn-expense');
-            const incomeBtn = document.getElementById('btn-income');
-            
-            if (type === 'expense') {
-                expenseBtn.className = 'py-2 rounded-lg bg-rose-500/20 border border-rose-500 text-rose-400 font-semibold transition-all';
-                incomeBtn.className = 'py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-400 font-semibold transition-all';
-            } else {
-                expenseBtn.className = 'py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-400 font-semibold transition-all';
-                incomeBtn.className = 'py-2 rounded-lg bg-emerald-500/20 border border-emerald-500 text-emerald-400 font-semibold transition-all';
-            }
-        }
-
-        function addTransaction() {
-            const amount = parseFloat(document.getElementById('transaction-amount').value);
-            const category = document.getElementById('transaction-category').value;
-            const dateInput = document.getElementById('transaction-date').value;
-            
-            if (!amount || amount <= 0) {
-                showNotification('Error', 'Please enter a valid amount', 'error');
-                return;
-            }
-
-            const isIncome = currentTransactionType === 'income';
-            const merchant = isIncome ? 'Manual Income' : `${category.charAt(0).toUpperCase() + category.slice(1)} Expense`;
-            
-            const transactionDate = dateInput ? new Date(dateInput) : new Date();
-            
-            transactions.unshift({
-                id: Date.now(),
-                merchant,
-                amount,
-                category,
-                date: transactionDate.toISOString(),
-                type: currentTransactionType
-            });
-            
-            if (isIncome) {
-                // INCOME: Increases savings
-                savings += amount;
-                updateSavingsDisplay();
-            } else {
-                // EXPENSE: Decreases savings AND affects budget
-                savings -= amount;
-                updateSavingsDisplay();
-                
-                budgetSpent += amount;
-                updateBudgetDisplay();
-            }
-            
-            updateTransactionsUI();
-            updateChartWithData();
-            
-            if (transactions.length === 1) {
-                updateStreak();
-                createConfetti();
-                showNotification('First Step!', 'You\'ve started your savings journey!', 'success');
-            } else {
-                showNotification('Success', 'Transaction added!', 'success');
-            }
-            
-            document.getElementById('transaction-amount').value = '';
-            initDatePicker();
-        }
-
-        // Goal Functions
-        function openGoalModal() {
-            document.getElementById('goal-modal').classList.remove('hidden');
-        }
-
-        function closeGoalModal() {
-            document.getElementById('goal-modal').classList.add('hidden');
-        }
-
-        function selectIcon(icon) {
-            selectedIcon = icon;
-            document.querySelectorAll('.icon-btn').forEach(btn => {
-                btn.classList.remove('bg-indigo-600', 'border-indigo-500');
-                btn.classList.add('bg-gray-800', 'border-transparent');
-            });
-            event.target.classList.remove('bg-gray-800', 'border-transparent');
-            event.target.classList.add('bg-indigo-600', 'border-indigo-500');
-        }
-
-        function createGoal() {
-            const name = document.getElementById('goal-name').value;
-            const amount = parseFloat(document.getElementById('goal-amount').value);
-            const date = document.getElementById('goal-date').value;
-            
-            if (!name || !amount || !date) {
-                showNotification('Error', 'Please fill all fields', 'error');
-                return;
-            }
-
-            const months = Math.ceil((new Date(date) - new Date()) / (1000 * 60 * 60 * 24 * 30));
-            const color = ['yellow', 'blue', 'purple', 'pink', 'indigo'][goals.length % 5];
-            
-            const goal = { name, target: amount, saved: 0, icon: selectedIcon, months, color };
-            goals.push(goal);
-            renderGoals();
-            
-            closeGoalModal();
-            createConfetti();
-            showNotification('Goal Created!', 'Your savings journey begins!', 'success');
-            
-            document.getElementById('goal-name').value = '';
-            document.getElementById('goal-amount').value = '';
-            document.getElementById('goal-date').value = '';
-        }
-
-        function renderGoals() {
-            const container = document.getElementById('goals-container');
-            document.getElementById('active-goals').textContent = goals.length;
-            
-            if (goals.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state py-8">
-                        <i class="fas fa-bullseye text-gray-600"></i>
-                        <h4 class="text-lg font-semibold text-gray-400 mb-2">No goals yet</h4>
-                        <p class="text-sm text-gray-500">Create your first savings goal</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = goals.map((goal) => {
-                const monthlyNeed = (goal.target / goal.months).toFixed(0);
-                
-                return `
-                    <div class="p-4 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 relative overflow-hidden group slide-in">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-${goal.color}-400 to-${goal.color}-600 flex items-center justify-center text-2xl">
-                                    ${goal.icon}
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-lg">${goal.name}</h4>
-                                    <p class="text-sm text-gray-400">Target: ${goal.months} months • $${goal.target.toLocaleString()}</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-2xl font-bold text-${goal.color}-400">$0</p>
-                                <p class="text-xs text-gray-400">saved</p>
-                            </div>
-                        </div>
-                        <div class="relative pt-1">
-                            <div class="flex mb-2 items-center justify-between">
-                                <div class="text-xs font-semibold text-${goal.color}-400">0% Complete</div>
-                                <div class="text-xs text-gray-400">$${goal.target.toLocaleString()} to go</div>
-                            </div>
-                            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-700">
-                                <div style="width:0%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-${goal.color}-400 to-${goal.color}-600 transition-all duration-500"></div>
-                            </div>
-                            <div class="flex items-center justify-between text-xs">
-                                <span class="text-gray-400">Monthly need: <span class="text-white font-bold">$${monthlyNeed}</span></span>
-                                <span class="text-gray-400 flex items-center gap-1">
-                                    <i class="fas fa-clock"></i> Just started
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function createConfetti() {
-            const colors = ['#f43f5e', '#8b5cf6', '#10b981', '#f59e0b', '#3b82f6'];
-            for (let i = 0; i < 30; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                    document.getElementById('confetti-container').appendChild(confetti);
-                    setTimeout(() => confetti.remove(), 4000);
-                }, i * 30);
+        function updateStreak() {
+            streakCount = 1;
+            document.getElementById('streak-count').textContent = streakCount;
+            document.getElementById('streak-display').textContent = `${streakCount} Day Streak`;
+            const fireIcon = document.querySelector('.fa-fire');
+            if (fireIcon) {
+                fireIcon.classList.remove('opacity-30');
+                fireIcon.classList.add('streak-flame', 'text-orange-500');
             }
         }
 
@@ -1139,22 +1158,23 @@
             const colors = {
                 success: 'emerald',
                 error: 'rose',
-                info: 'blue'
+                info: 'blue',
+                warning: 'yellow'
             };
             
-            const color = colors[type];
+            const color = colors[type] || 'emerald';
             notif.querySelector('.glass').className = `glass rounded-xl p-4 border border-${color}-500/30 flex items-center gap-3 notification bg-slate-900`;
-            notif.querySelector('i').className = `fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'} text-${color}-400`;
+            notif.querySelector('i').className = `fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info'} text-${color}-400`;
             notifTitle.className = `font-bold text-${color}-400`;
             
             notifTitle.textContent = title;
             notifMessage.textContent = message;
             
             notif.classList.remove('hidden');
-            setTimeout(() => notif.classList.add('hidden'), 3000);
+            setTimeout(() => notif.classList.add('hidden'), type === 'error' ? 5000 : 3000);
         }
 
-        // Check auth on load
+        // Load
         window.addEventListener('load', () => {
             const saved = localStorage.getItem('smartsave_user');
             if (saved) {
@@ -1166,7 +1186,6 @@
                 document.getElementById('display-name').textContent = currentUser.name;
                 document.getElementById('user-initial').textContent = currentUser.name[0].toUpperCase();
                 initDatePicker();
-                renderGoals();
             }
         });
     </script>
