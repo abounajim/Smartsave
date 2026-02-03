@@ -31,8 +31,7 @@
         .demo-bg { filter: blur(2px) brightness(0.4); pointer-events: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; z-index: 0; }
         .empty-state { text-align: center; padding: 3rem 1rem; color: #6b7280; }
         .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
-        .progress-bar-striped { background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem; animation: progress-bar-stripes 1s linear infinite; }
-        @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     </style>
 </head>
 <body class="text-white min-h-screen overflow-x-hidden">
@@ -233,18 +232,17 @@
         </div>
     </nav>
 
-    <!-- Main Content (Zeroed State) -->
+    <!-- Main Content -->
     <main class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto hidden" id="main-content">
         
-        <!-- Empty State Banner -->
+        <!-- Welcome -->
         <div class="mb-8 text-center slide-in">
             <h1 class="text-4xl md:text-5xl font-bold mb-2">Welcome, <span class="gradient-text" id="display-name">Saver</span>! 🎉</h1>
             <p class="text-gray-400 text-lg">Start your savings journey by connecting a bank or adding your first transaction</p>
         </div>
 
-        <!-- Zeroed Stats Grid -->
+        <!-- Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Savings -->
             <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
                 <div class="flex justify-between items-start mb-4">
                     <div>
@@ -258,7 +256,6 @@
                 <p class="text-sm text-gray-500">Start saving to see growth</p>
             </div>
 
-            <!-- Monthly Budget -->
             <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
                 <div class="flex justify-between items-start mb-4">
                     <div>
@@ -275,7 +272,6 @@
                 <p class="text-xs text-gray-400 mt-2">Set a budget to get started</p>
             </div>
 
-            <!-- Active Goals -->
             <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
                 <div class="flex justify-between items-start mb-4">
                     <div>
@@ -289,7 +285,6 @@
                 <p class="text-sm text-gray-500">No active goals yet</p>
             </div>
 
-            <!-- Streak Status -->
             <div class="glass rounded-2xl p-6 card-hover relative overflow-hidden">
                 <div class="flex justify-between items-start mb-4">
                     <div>
@@ -307,7 +302,7 @@
             </div>
         </div>
 
-        <!-- Getting Started CTA -->
+        <!-- CTA -->
         <div class="mb-8 glass rounded-2xl p-8 border border-indigo-500/30 relative overflow-hidden bg-gradient-to-br from-indigo-900/20 to-purple-900/20 slide-in">
             <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
@@ -325,33 +320,48 @@
             </div>
         </div>
 
-        <!-- Main Dashboard Grid -->
+        <!-- Dashboard Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <!-- Left Column -->
             <div class="lg:col-span-2 space-y-8">
                 
-                <!-- Empty Analytics State -->
+                <!-- Spending Analytics -->
                 <div class="glass rounded-2xl p-6 slide-in min-h-[400px] flex flex-col">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2">
                             <i class="fas fa-chart-pie text-indigo-400"></i>
                             Spending Analytics
                         </h3>
+                        <select id="timeframe-select" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-indigo-500" onchange="updateTimeframe(this.value)">
+                            <option value="month">This Month</option>
+                            <option value="last_month">Last Month</option>
+                        </select>
                     </div>
-                    <div class="flex-1 flex items-center justify-center" id="chart-container">
-                        <div class="empty-state">
-                            <i class="fas fa-chart-pie text-gray-600"></i>
-                            <h4 class="text-lg font-semibold text-gray-400 mb-2">No data yet</h4>
-                            <p class="text-sm text-gray-500 mb-4">Connect a bank account or add transactions to see your spending analytics</p>
-                            <button onclick="openBankModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm transition-colors">
-                                Connect Bank
-                            </button>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+                        <!-- Chart Side -->
+                        <div class="relative h-64" id="chart-wrapper">
+                            <div id="chart-container" class="h-full flex items-center justify-center">
+                                <div class="empty-state text-center">
+                                    <i class="fas fa-chart-pie text-4xl text-gray-600 mb-3"></i>
+                                    <h4 class="text-lg font-semibold text-gray-400 mb-2">No data yet</h4>
+                                    <p class="text-sm text-gray-500 mb-4">Add a transaction to see analytics</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Categories Side -->
+                        <div class="space-y-4" id="category-breakdown">
+                            <div class="empty-state text-center h-full flex flex-col items-center justify-center">
+                                <i class="fas fa-list text-4xl text-gray-600 mb-3"></i>
+                                <p class="text-sm text-gray-500">Categories will appear here</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Empty Goals State -->
+                <!-- Goals -->
                 <div class="glass rounded-2xl p-6 slide-in">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2">
@@ -371,7 +381,7 @@
                     </div>
                 </div>
 
-                <!-- AI Advisor Empty State -->
+                <!-- AI Advisor -->
                 <div class="glass rounded-2xl p-6 slide-in border border-indigo-500/30 relative overflow-hidden">
                     <div class="flex items-start gap-4">
                         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 floating">
@@ -404,7 +414,7 @@
             <!-- Right Column -->
             <div class="space-y-8">
                 
-                <!-- Quick Add (Always visible) -->
+                <!-- Quick Add with Date -->
                 <div class="glass rounded-2xl p-6 slide-in">
                     <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                         <i class="fas fa-plus-circle text-emerald-400"></i>
@@ -415,9 +425,16 @@
                             <label class="block text-sm text-gray-400 mb-2">Amount</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                                <input type="number" id="transaction-amount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-8 py-3 focus:outline-none focus:border-emerald-500 transition-colors" placeholder="0.00">
+                                <input type="number" id="transaction-amount" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-8 py-3 focus:outline-none focus:border-emerald-500 transition-colors" placeholder="0.00" step="0.01">
                             </div>
                         </div>
+                        
+                        <!-- Date Picker -->
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Date</label>
+                            <input type="date" id="transaction-date" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-colors text-white">
+                        </div>
+                        
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Category</label>
                             <select id="transaction-category" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-colors">
@@ -442,7 +459,7 @@
                     </div>
                 </div>
 
-                <!-- Recent Activity Empty State -->
+                <!-- Recent Activity -->
                 <div class="glass rounded-2xl p-6 slide-in">
                     <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                         <i class="fas fa-history text-blue-400"></i>
@@ -457,7 +474,7 @@
                     </div>
                 </div>
 
-                <!-- Achievements Locked State -->
+                <!-- Achievements -->
                 <div class="glass rounded-2xl p-6 slide-in opacity-75">
                     <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                         <i class="fas fa-medal text-yellow-400"></i>
@@ -482,7 +499,7 @@
         </div>
     </main>
 
-    <!-- New Goal Modal -->
+    <!-- Goal Modal -->
     <div id="goal-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeGoalModal()"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 glass rounded-2xl border border-gray-700 bg-slate-900">
@@ -518,7 +535,7 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
+    <!-- Notification -->
     <div id="notification" class="fixed bottom-4 right-4 z-50 hidden">
         <div class="glass rounded-xl p-4 border border-emerald-500/30 flex items-center gap-3 notification bg-slate-900">
             <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -532,7 +549,7 @@
     </div>
 
     <script>
-        // App State - STARTS AT ZERO
+        // State - STARTS AT ZERO
         let currentTransactionType = 'expense';
         let selectedIcon = '✈️';
         let streakCount = 0;
@@ -543,7 +560,7 @@
         let goals = [];
         let spendingChart = null;
 
-        // Smart categorization patterns
+        // Category patterns for AI
         const categoryPatterns = {
             food: ['restaurant', 'cafe', 'coffee', 'pizza', 'burger', 'grocery', 'supermarket', 'food', 'dining'],
             transport: ['uber', 'lyft', 'taxi', 'gas', 'fuel', 'parking', 'transit', 'bus', 'train', 'metro'],
@@ -552,7 +569,17 @@
             bills: ['electric', 'water', 'internet', 'phone', 'rent', 'mortgage', 'insurance', 'subscription']
         };
 
-        // Auth Functions
+        // Initialize date picker to today
+        function initDatePicker() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('transaction-date');
+            if (dateInput) {
+                dateInput.value = today;
+                dateInput.max = today;
+            }
+        }
+
+        // Auth
         function switchAuthMode(mode) {
             const loginTab = document.getElementById('tab-login');
             const registerTab = document.getElementById('tab-register');
@@ -577,11 +604,9 @@
             const email = document.getElementById('user-email').value;
             const name = document.getElementById('user-name').value || 'Saver';
             
-            // Simulate authentication
             currentUser = { email, name, id: Date.now() };
             localStorage.setItem('smartsave_user', JSON.stringify(currentUser));
             
-            // Hide demo background and auth modal
             document.getElementById('demo-background').style.display = 'none';
             document.getElementById('auth-modal').classList.add('fade-out');
             
@@ -592,8 +617,7 @@
                 document.getElementById('display-name').textContent = name;
                 document.getElementById('user-initial').textContent = name[0].toUpperCase();
                 
-                // Initialize empty chart
-                initEmptyChart();
+                initDatePicker();
                 showNotification('Welcome!', `Your fresh start begins now, ${name}!`, 'success');
             }, 500);
         });
@@ -603,33 +627,7 @@
             location.reload();
         }
 
-        function initEmptyChart() {
-            const ctx = document.getElementById('spendingChart');
-            if (!ctx) return;
-            
-            const context = ctx.getContext('2d');
-            spendingChart = new Chart(context, {
-                type: 'doughnut',
-                data: {
-                    labels: ['No Data'],
-                    datasets: [{
-                        data: [1],
-                        backgroundColor: ['rgba(75, 85, 99, 0.3)'],
-                        borderWidth: 0,
-                        cutout: '70%'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    }
-                }
-            });
-        }
-
+        // Chart Functions
         function updateChartWithData() {
             const breakdown = {};
             transactions.forEach(t => {
@@ -639,6 +637,10 @@
             });
             
             if (Object.keys(breakdown).length === 0) return;
+            
+            // Clear empty state and create canvas
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.innerHTML = '<canvas id="spendingChart"></canvas>';
             
             const labels = Object.keys(breakdown).map(c => c.charAt(0).toUpperCase() + c.slice(1));
             const data = Object.values(breakdown);
@@ -672,16 +674,51 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: '#9ca3af', padding: 20, usePointStyle: true }
+                            labels: { color: '#9ca3af', padding: 15, usePointStyle: true, font: { size: 11 } }
                         }
                     },
                     cutout: '60%'
                 }
             });
             
-            // Replace empty state with chart
-            document.getElementById('chart-container').innerHTML = '<canvas id="spendingChart"></canvas>';
-            updateCategoryBreakdown();
+            updateCategoryBreakdown(breakdown);
+        }
+
+        function updateCategoryBreakdown(breakdownData) {
+            const container = document.getElementById('category-breakdown');
+            if (!container) return;
+            
+            const total = Object.values(breakdownData).reduce((a, b) => a + b, 0);
+            
+            const colors = {
+                food: { color: 'rose', icon: 'fa-utensils', label: 'Food & Dining' },
+                shopping: { color: 'blue', icon: 'fa-shopping-bag', label: 'Shopping' },
+                transport: { color: 'emerald', icon: 'fa-bus', label: 'Transport' },
+                entertainment: { color: 'purple', icon: 'fa-film', label: 'Entertainment' },
+                bills: { color: 'yellow', icon: 'fa-bolt', label: 'Bills' },
+                others: { color: 'gray', icon: 'fa-receipt', label: 'Others' }
+            };
+            
+            container.innerHTML = Object.entries(breakdownData)
+                .sort((a, b) => b[1] - a[1])
+                .map(([cat, amount]) => {
+                    const config = colors[cat] || colors.others;
+                    const percent = total > 0 ? ((amount / total) * 100).toFixed(0) : 0;
+                    return `
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-gray-800/50 slide-in">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-${config.color}-500/20 flex items-center justify-center">
+                                    <i class="fas ${config.icon} text-${config.color}-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-sm">${config.label}</p>
+                                    <p class="text-xs text-gray-400">${percent}% of spending</p>
+                                </div>
+                            </div>
+                            <span class="font-bold text-${config.color}-400">$${amount.toFixed(0)}</span>
+                        </div>
+                    `;
+                }).join('');
         }
 
         // Bank Functions
@@ -712,7 +749,6 @@
             document.getElementById('bank-login').classList.add('hidden');
             document.getElementById('bank-loading').classList.remove('hidden');
             
-            // Simulate connection steps
             setTimeout(() => updateStep(1), 800);
             setTimeout(() => updateStep(2), 1600);
             setTimeout(() => updateStep(3), 2400);
@@ -732,11 +768,9 @@
             const balance = Math.floor(Math.random() * 5000) + 1000;
             connectedBanks.push({ id: bankId, name: bankName, balance: balance });
             
-            // Update savings with initial balance
             savings += balance;
             document.getElementById('total-savings').textContent = `$${savings.toLocaleString()}`;
             
-            // Generate first transactions
             generateMockTransactions(bankName);
             
             setTimeout(() => {
@@ -782,8 +816,11 @@
             streakCount = 1;
             document.getElementById('streak-count').textContent = streakCount;
             document.getElementById('streak-display').textContent = `${streakCount} Day Streak`;
-            document.querySelector('.fa-fire').classList.remove('opacity-30');
-            document.querySelector('.fa-fire').classList.add('streak-flame', 'text-orange-500');
+            const fireIcon = document.querySelector('.fa-fire');
+            if (fireIcon) {
+                fireIcon.classList.remove('opacity-30');
+                fireIcon.classList.add('streak-flame', 'text-orange-500');
+            }
         }
 
         function updateTransactionsUI() {
@@ -819,7 +856,9 @@
             container.innerHTML = transactions.slice(0, 5).map(t => {
                 const color = categoryColors[t.category];
                 const icon = categoryIcons[t.category];
-                const timeAgo = getTimeAgo(new Date(t.date));
+                const date = new Date(t.date);
+                const timeAgo = getTimeAgo(date);
+                const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 
                 return `
                     <div class="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors slide-in">
@@ -829,57 +868,13 @@
                             </div>
                             <div>
                                 <p class="font-semibold text-sm">${t.merchant}</p>
-                                <p class="text-xs text-gray-500">${timeAgo} • <span class="text-${color}-400 capitalize">${t.category}</span></p>
+                                <p class="text-xs text-gray-500">${dateStr} • <span class="text-${color}-400 capitalize">${t.category}</span></p>
                             </div>
                         </div>
                         <span class="text-rose-400 font-bold">-$${t.amount.toFixed(2)}</span>
                     </div>
                 `;
             }).join('');
-        }
-
-        function updateCategoryBreakdown() {
-            const container = document.getElementById('category-breakdown');
-            if (!container) return;
-            
-            const breakdown = {};
-            transactions.forEach(t => {
-                if (t.type === 'expense') {
-                    breakdown[t.category] = (breakdown[t.category] || 0) + t.amount;
-                }
-            });
-            
-            const total = Object.values(breakdown).reduce((a, b) => a + b, 0);
-            
-            const colors = {
-                food: { color: 'rose', icon: 'fa-utensils', label: 'Food & Dining' },
-                shopping: { color: 'blue', icon: 'fa-shopping-bag', label: 'Shopping' },
-                transport: { color: 'emerald', icon: 'fa-bus', label: 'Transport' },
-                entertainment: { color: 'purple', icon: 'fa-film', label: 'Entertainment' },
-                bills: { color: 'yellow', icon: 'fa-bolt', label: 'Bills' },
-                others: { color: 'gray', icon: 'fa-receipt', label: 'Others' }
-            };
-            
-            container.innerHTML = Object.entries(breakdown)
-                .sort((a, b) => b[1] - a[1])
-                .map(([cat, amount]) => {
-                    const config = colors[cat];
-                    const percent = ((amount / total) * 100).toFixed(0);
-                    return `
-                        <div class="flex items-center justify-between p-3 rounded-xl bg-gray-800/50 slide-in">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg bg-${config.color}-500/20 flex items-center justify-center">
-                                    <i class="fas ${config.icon} text-${config.color}-400"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold">${config.label}</p>
-                                    <p class="text-xs text-gray-400">${percent}% of spending</p>
-                                </div>
-                            </div>
-                            <span class="font-bold text-${config.color}-400">$${amount.toFixed(0)}</span>
-                        </div>
-                    `;
-                }).join('');
         }
 
         function getTimeAgo(date) {
@@ -910,6 +905,7 @@
         function addTransaction() {
             const amount = parseFloat(document.getElementById('transaction-amount').value);
             const category = document.getElementById('transaction-category').value;
+            const dateInput = document.getElementById('transaction-date').value;
             
             if (!amount || amount <= 0) {
                 showNotification('Error', 'Please enter a valid amount', 'error');
@@ -919,12 +915,15 @@
             const isIncome = currentTransactionType === 'income';
             const merchant = isIncome ? 'Manual Income' : `${category.charAt(0).toUpperCase() + category.slice(1)} Expense`;
             
+            // Use selected date or default to now
+            const transactionDate = dateInput ? new Date(dateInput) : new Date();
+            
             transactions.unshift({
                 id: Date.now(),
                 merchant,
                 amount,
                 category,
-                date: new Date().toISOString(),
+                date: transactionDate.toISOString(),
                 type: currentTransactionType
             });
             
@@ -932,7 +931,6 @@
                 savings += amount;
                 document.getElementById('total-savings').textContent = `$${savings.toLocaleString()}`;
             } else {
-                // Update budget progress (simplified)
                 const currentSpent = parseInt(document.getElementById('budget-progress').style.width) || 0;
                 const newWidth = Math.min(currentSpent + 5, 100);
                 document.getElementById('budget-progress').style.width = newWidth + '%';
@@ -943,7 +941,6 @@
             updateTransactionsUI();
             updateChartWithData();
             
-            // First transaction celebration
             if (transactions.length === 1) {
                 updateStreak();
                 createConfetti();
@@ -952,7 +949,9 @@
                 showNotification('Success', 'Transaction added!', 'success');
             }
             
+            // Reset form but keep date as today
             document.getElementById('transaction-amount').value = '';
+            initDatePicker();
         }
 
         function quickCash(amount) {
@@ -1023,7 +1022,6 @@
             }
             
             container.innerHTML = goals.map((goal) => {
-                const percent = 0;
                 const monthlyNeed = (goal.target / goal.months).toFixed(0);
                 
                 return `
@@ -1078,7 +1076,6 @@
             }
         }
 
-        // Notification System
         function showNotification(title, message, type = 'success') {
             const notif = document.getElementById('notification');
             const notifTitle = document.getElementById('notif-title');
@@ -1102,6 +1099,10 @@
             setTimeout(() => notif.classList.add('hidden'), 3000);
         }
 
+        function updateTimeframe(period) {
+            showNotification('Updating', `Switched to ${period.replace('_', ' ')} view`, 'info');
+        }
+
         // Check auth on load
         window.addEventListener('load', () => {
             const saved = localStorage.getItem('smartsave_user');
@@ -1113,7 +1114,7 @@
                 document.getElementById('main-nav').classList.remove('hidden');
                 document.getElementById('display-name').textContent = currentUser.name;
                 document.getElementById('user-initial').textContent = currentUser.name[0].toUpperCase();
-                initEmptyChart();
+                initDatePicker();
                 renderGoals();
             }
         });
