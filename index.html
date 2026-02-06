@@ -114,24 +114,21 @@
             border-color: #818cf8;
         }
         
-        /* Language selector */
-        .lang-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
+        /* Settings styles */
+        .settings-option {
+            cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.875rem;
         }
-        .lang-btn.active {
-            background: rgba(99, 102, 241, 0.3);
-            border: 1px solid rgba(99, 102, 241, 0.5);
-            color: #818cf8;
-        }
-        .lang-btn:not(.active) {
-            color: #9ca3af;
-        }
-        .lang-btn:not(.active):hover {
+        .settings-option:hover {
             background: rgba(255, 255, 255, 0.05);
-            color: white;
+        }
+        .settings-option.selected {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: #818cf8;
+        }
+        .currency-flag {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
         }
     </style>
 </head>
@@ -161,12 +158,6 @@
             </div>
             
             <div class="glass rounded-3xl p-8 border border-gray-700 shadow-2xl bg-slate-900/80">
-                <!-- Language Selector -->
-                <div class="flex justify-end mb-4 gap-2">
-                    <button onclick="setLanguage('en')" class="lang-btn active" id="lang-en">EN</button>
-                    <button onclick="setLanguage('pt')" class="lang-btn" id="lang-pt">PT</button>
-                </div>
-                
                 <div class="flex gap-4 mb-6">
                     <button onclick="switchAuthMode('login')" id="tab-login" class="flex-1 py-2 rounded-xl bg-indigo-600 text-white font-semibold transition-all" data-i18n="login">Login</button>
                     <button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-2 rounded-xl bg-gray-800 text-gray-400 font-semibold transition-all" data-i18n="signup">Sign Up</button>
@@ -212,6 +203,98 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeSettingsModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg p-6 glass rounded-2xl border border-gray-700 bg-slate-900 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-cog text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold" data-i18n="settings">Settings</h3>
+                </div>
+                <button onclick="closeSettingsModal()" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Language Section -->
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider" data-i18n="language">Language</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="selectLanguage('en')" id="lang-option-en" class="settings-option p-4 rounded-xl border border-gray-700 flex items-center gap-3">
+                            <span class="text-2xl">🇺🇸</span>
+                            <div>
+                                <p class="font-semibold">English</p>
+                                <p class="text-xs text-gray-400">United States</p>
+                            </div>
+                        </div>
+                        <div onclick="selectLanguage('pt')" id="lang-option-pt" class="settings-option p-4 rounded-xl border border-gray-700 flex items-center gap-3">
+                            <span class="text-2xl">🇧🇷</span>
+                            <div>
+                                <p class="font-semibold">Português</p>
+                                <p class="text-xs text-gray-400">Brasil</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Currency Section -->
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider" data-i18n="currency">Currency</h4>
+                    <div class="space-y-2">
+                        <div onclick="selectCurrency('USD')" id="currency-option-USD" class="settings-option p-4 rounded-xl border border-gray-700 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="currency-flag">🇺🇸</span>
+                                <div>
+                                    <p class="font-semibold">USD</p>
+                                    <p class="text-xs text-gray-400">US Dollar</p>
+                                </div>
+                            </div>
+                            <span class="text-gray-400">$</span>
+                        </div>
+                        <div onclick="selectCurrency('BRL')" id="currency-option-BRL" class="settings-option p-4 rounded-xl border border-gray-700 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="currency-flag">🇧🇷</span>
+                                <div>
+                                    <p class="font-semibold">BRL</p>
+                                    <p class="text-xs text-gray-400">Brazilian Real</p>
+                                </div>
+                            </div>
+                            <span class="text-gray-400">R$</span>
+                        </div>
+                        <div onclick="selectCurrency('EUR')" id="currency-option-EUR" class="settings-option p-4 rounded-xl border border-gray-700 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="currency-flag">🇪🇺</span>
+                                <div>
+                                    <p class="font-semibold">EUR</p>
+                                    <p class="text-xs text-gray-400">Euro</p>
+                                </div>
+                            </div>
+                            <span class="text-gray-400">€</span>
+                        </div>
+                        <div onclick="selectCurrency('GBP')" id="currency-option-GBP" class="settings-option p-4 rounded-xl border border-gray-700 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="currency-flag">🇬🇧</span>
+                                <div>
+                                    <p class="font-semibold">GBP</p>
+                                    <p class="text-xs text-gray-400">British Pound</p>
+                                </div>
+                            </div>
+                            <span class="text-gray-400">£</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="saveSettings()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-bold hover:shadow-lg transition-all" data-i18n="saveSettings">
+                    Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation -->
     <nav class="fixed top-0 w-full z-40 glass border-b border-gray-800 hidden" id="main-nav">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -225,13 +308,7 @@
                         <i class="fas fa-robot ai-thinking"></i> AI Active
                     </span>
                 </div>
-                <div class="flex items-center gap-4">
-                    <!-- Language Toggle -->
-                    <div class="flex items-center gap-1 bg-gray-800/50 rounded-lg p-1">
-                        <button onclick="setLanguage('en')" class="lang-btn px-2 py-1 text-xs" id="nav-lang-en">EN</button>
-                        <button onclick="setLanguage('pt')" class="lang-btn px-2 py-1 text-xs" id="nav-lang-pt">PT</button>
-                    </div>
-                    
+                <div class="flex items-center gap-6">
                     <div class="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30">
                         <i class="fas fa-fire text-orange-500 streak-flame"></i>
                         <span class="font-bold text-orange-400" id="streak-display">0 Day Streak</span>
@@ -255,6 +332,10 @@
                                 <button onclick="showAIReport()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 text-white flex items-center gap-2 mb-1">
                                     <i class="fas fa-brain text-purple-400"></i> <span data-i18n="aiAnalysis">AI Analysis</span>
                                 </button>
+                                <div class="border-t border-gray-700 my-1"></div>
+                                <button onclick="openSettingsModal()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 text-white flex items-center gap-2 mb-1">
+                                    <i class="fas fa-cog text-gray-400"></i> <span data-i18n="settings">Settings</span>
+                                </button>
                                 <button onclick="logout()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 text-red-400 flex items-center gap-2">
                                     <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Logout</span>
                                 </button>
@@ -276,7 +357,7 @@
                 <div>
                     <label class="block text-sm text-gray-400 mb-2" data-i18n="monthlyBudget">Monthly Budget</label>
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 currency-symbol">R$</span>
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 currency-symbol">$</span>
                         <input type="number" id="budget-input" class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="2000" min="1">
                     </div>
                 </div>
@@ -330,7 +411,7 @@
                 <div>
                     <label class="block text-sm text-gray-400 mb-2" data-i18n="targetSavings">Target Savings</label>
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 currency-symbol">R$</span>
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 currency-symbol">$</span>
                         <input type="number" id="savings-goal-input" class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-indigo-500" placeholder="5000" min="1">
                     </div>
                 </div>
@@ -341,7 +422,7 @@
                 <!-- Monthly calculation preview -->
                 <div id="monthly-calc-preview" class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hidden">
                     <p class="text-sm text-emerald-300 mb-1" data-i18n="requiredMonthlySavings">Required Monthly Savings:</p>
-                    <p class="text-2xl font-bold text-emerald-400" id="monthly-required">R$ 0</p>
+                    <p class="text-2xl font-bold text-emerald-400" id="monthly-required">$0</p>
                     <p class="text-xs text-gray-400 mt-1" id="months-until">0 months to reach goal</p>
                 </div>
                 <div class="flex gap-3 pt-2">
@@ -407,13 +488,13 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-400" data-i18n="aiDailyLimit">AI Recommended Daily Limit</p>
-                        <h3 class="text-2xl font-bold text-indigo-400" id="daily-limit-amount">R$ 0</h3>
+                        <h3 class="text-2xl font-bold text-indigo-400" id="daily-limit-amount">$0</h3>
                         <p class="text-xs text-gray-500" id="days-remaining">to reach your goal</p>
                     </div>
                 </div>
                 <div class="text-right">
                     <p class="text-sm text-gray-400" data-i18n="spentToday">Spent Today</p>
-                    <h3 class="text-2xl font-bold" id="spent-today">R$ 0</h3>
+                    <h3 class="text-2xl font-bold" id="spent-today">$0</h3>
                     <p class="text-xs" id="daily-status">On track</p>
                 </div>
             </div>
@@ -432,7 +513,7 @@
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-gray-400 text-sm mb-1" data-i18n="totalSavings">Total Savings</p>
-                        <h3 class="text-3xl font-bold text-emerald-400" id="total-savings">R$ 0</h3>
+                        <h3 class="text-3xl font-bold text-emerald-400" id="total-savings">$0</h3>
                         <p class="text-sm mt-1" id="savings-goal-text">Goal: Not set</p>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
@@ -492,7 +573,7 @@
                         <h3 class="text-2xl font-bold text-white" id="goal-name-display">Trip to Japan</h3>
                         <p class="text-sm text-gray-400" id="goal-desc-display">Dream vacation with friends</p>
                         <p class="text-xs text-emerald-400 mt-1">
-                            <span data-i18n="target">Target</span>: <span id="goal-target-display" class="font-semibold">R$ 0</span> 
+                            <span data-i18n="target">Target</span>: <span id="goal-target-display" class="font-semibold">$0</span> 
                             <span data-i18n="by">by</span> <span id="goal-date-display" class="font-semibold">-</span>
                         </p>
                     </div>
@@ -518,13 +599,13 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="glass rounded-xl p-4 text-center border border-white/5">
                     <p class="text-xs text-gray-400 mb-1" data-i18n="monthlyNeed">Monthly Need</p>
-                    <p class="text-2xl font-bold text-emerald-400" id="goal-monthly-need">R$ 0</p>
+                    <p class="text-2xl font-bold text-emerald-400" id="goal-monthly-need">$0</p>
                     <p class="text-xs text-gray-500 mt-1" data-i18n="toReachTarget">to reach target</p>
                 </div>
                 <div class="glass rounded-xl p-4 text-center border border-white/5">
                     <p class="text-xs text-gray-400 mb-1" data-i18n="savedSoFar">Saved So Far</p>
-                    <p class="text-2xl font-bold text-white" id="goal-current-display">R$ 0</p>
-                    <p class="text-xs text-gray-500 mt-1" id="goal-amount-remaining">R$ 0 remaining</p>
+                    <p class="text-2xl font-bold text-white" id="goal-current-display">$0</p>
+                    <p class="text-xs text-gray-500 mt-1" id="goal-amount-remaining">$0 remaining</p>
                 </div>
                 <div class="glass rounded-xl p-4 text-center border border-white/5">
                     <p class="text-xs text-gray-400 mb-1" data-i18n="timeLeft">Time Left</p>
@@ -627,8 +708,8 @@
                         <div>
                             <label class="block text-sm text-gray-400 mb-2" data-i18n="amount">Amount</label>
                             <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 currency-symbol">R$</span>
-                                <input type="number" id="transaction-amount" class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-emerald-500 transition-colors" placeholder="0,00" step="0.01">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 currency-symbol">$</span>
+                                <input type="number" id="transaction-amount" class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-emerald-500 transition-colors" placeholder="0.00" step="0.01">
                             </div>
                         </div>
                         
@@ -775,7 +856,11 @@
                 swipeToDelete: "Swipe to delete",
                 noTransactions: "No transactions yet",
                 aiDailyLimit: "AI Recommended Daily Limit",
-                spentToday: "Spent Today"
+                spentToday: "Spent Today",
+                settings: "Settings",
+                language: "Language",
+                currency: "Currency",
+                saveSettings: "Save Settings"
             },
             pt: {
                 tagline: "Análise de gastos com IA, detecção de padrões e previsões inteligentes.",
@@ -853,53 +938,99 @@
                 swipeToDelete: "Deslize para excluir",
                 noTransactions: "Nenhuma transação ainda",
                 aiDailyLimit: "Limite Diário Recomendado pela IA",
-                spentToday: "Gasto Hoje"
+                spentToday: "Gasto Hoje",
+                settings: "Configurações",
+                language: "Idioma",
+                currency: "Moeda",
+                saveSettings: "Salvar Configurações"
             }
         };
 
         let currentLanguage = 'en';
-        let currentCurrency = 'BRL';
+        let currentCurrency = 'USD';
+        
+        // Currency configuration
+        const currencyConfig = {
+            USD: { symbol: '$', locale: 'en-US', flag: '🇺🇸' },
+            BRL: { symbol: 'R$', locale: 'pt-BR', flag: '🇧🇷' },
+            EUR: { symbol: '€', locale: 'de-DE', flag: '🇪🇺' },
+            GBP: { symbol: '£', locale: 'en-GB', flag: '🇬🇧' }
+        };
 
-        function setLanguage(lang) {
-            currentLanguage = lang;
-            
-            // Update buttons
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(`lang-${lang}`)?.classList.add('active');
-            document.getElementById(`nav-lang-${lang}`)?.classList.add('active');
-            
-            // Update all elements with data-i18n
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    el.textContent = translations[lang][key];
-                }
-            });
-            
-            // Update placeholders
-            const nameInput = document.getElementById('user-name');
-            const goalNameInput = document.getElementById('savings-goal-name');
-            const goalDescInput = document.getElementById('savings-goal-desc');
-            
-            if (nameInput) nameInput.placeholder = lang === 'pt' ? 'João Silva' : 'John Doe';
-            if (goalNameInput) goalNameInput.placeholder = lang === 'pt' ? 'Ex: Viagem para o Japão' : 'e.g., Trip to Japan';
-            if (goalDescInput) goalDescInput.placeholder = lang === 'pt' ? 'Férias dos sonhos com amigos...' : 'Dream vacation with friends...';
-            
-            // Refresh displays
-            updateAllDisplays();
+        // Temp settings for modal
+        let tempSettings = { language: 'en', currency: 'USD' };
+
+        function openSettingsModal() {
+            tempSettings = { language: currentLanguage, currency: currentCurrency };
+            document.getElementById('settings-modal').classList.remove('hidden');
+            updateSettingsUI();
         }
 
-        // State
-        let currentTransactionType = 'expense';
-        let selectedIcon = 'fa-plane';
-        let streakCount = 0;
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function selectLanguage(lang) {
+            tempSettings.language = lang;
+            updateSettingsUI();
+        }
+
+        function selectCurrency(curr) {
+            tempSettings.currency = curr;
+            updateSettingsUI();
+        }
+
+        function updateSettingsUI() {
+            // Update language selection
+            document.querySelectorAll('[id^="lang-option-"]').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.getElementById(`lang-option-${tempSettings.language}`).classList.add('selected');
+            
+            // Update currency selection
+            document.querySelectorAll('[id^="currency-option-"]').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.getElementById(`currency-option-${tempSettings.currency}`).classList.add('selected');
+        }
+
+        function saveSettings() {
+            currentLanguage = tempSettings.language;
+            currentCurrency = tempSettings.currency;
+            
+            // Save to localStorage
+            localStorage.setItem('smartsave_settings', JSON.stringify({ language: currentLanguage, currency: currentCurrency }));
+            
+            // Apply settings
+            setLanguage(currentLanguage);
+            updateCurrencySymbols();
+            updateAllDisplays();
+            
+            closeSettingsModal();
+            showNotification(currentLanguage === 'pt' ? 'Configurações Salvas' : 'Settings Saved', currentLanguage === 'pt' ? 'Idioma e moeda atualizados' : 'Language and currency updated', 'success');
+        }
+
+        function updateCurrencySymbols() {
+            const config = currencyConfig[currentCurrency];
+            document.querySelectorAll('.currency-symbol').forEach(el => {
+                el.textContent = config.symbol;
+            });
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('smartsave_settings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                currentLanguage = settings.language || 'en';
+                currentCurrency = settings.currency || 'USD';
+                setLanguage(currentLanguage);
+                updateCurrencySymbols();
+            }
+        }
+
         let savings = 0;
         let currentUser = null;
-        let connectedBanks = [];
         let transactions = [];
-        let goals = [];
         let spendingChart = null;
         let savingsChart = null;
         let monthlyBudget = 0;
@@ -926,10 +1057,31 @@
         };
 
         function formatMoney(amount) {
-            if (currentCurrency === 'BRL') {
-                return 'R$ ' + amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-            return '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const config = currencyConfig[currentCurrency];
+            return new Intl.NumberFormat(config.locale, { 
+                style: 'currency', 
+                currency: currentCurrency 
+            }).format(amount);
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update placeholders
+            const nameInput = document.getElementById('user-name');
+            const goalNameInput = document.getElementById('savings-goal-name');
+            const goalDescInput = document.getElementById('savings-goal-desc');
+            
+            if (nameInput) nameInput.placeholder = lang === 'pt' ? 'João Silva' : 'John Doe';
+            if (goalNameInput) goalNameInput.placeholder = lang === 'pt' ? 'Ex: Viagem para o Japão' : 'e.g., Trip to Japan';
+            if (goalDescInput) goalDescInput.placeholder = lang === 'pt' ? 'Férias dos sonhos com amigos...' : 'Dream vacation with friends...';
         }
 
         function updateAllDisplays() {
@@ -963,7 +1115,6 @@
             }
         }
 
-        // Goal Icon Selection
         function selectGoalIcon(element) {
             document.querySelectorAll('.goal-icon-option').forEach(el => {
                 el.classList.remove('selected');
@@ -972,7 +1123,6 @@
             document.getElementById('selected-goal-icon').value = element.dataset.icon;
         }
 
-        // Delete Functions
         function openDeleteModal(id) {
             transactionToDelete = id;
             document.getElementById('delete-modal').classList.remove('hidden');
@@ -1011,7 +1161,6 @@
             showNotification(currentLanguage === 'pt' ? 'Excluído' : 'Deleted', currentLanguage === 'pt' ? 'Transação removida' : 'Transaction removed', 'success');
         }
 
-        // AI Analysis System
         function runAIAnalysis() {
             if (transactions.length < 3) {
                 const msg = currentLanguage === 'pt' 
@@ -1100,8 +1249,7 @@
             if (daysWithData < 3) return;
             
             const avgDailySpend = expenses.reduce((sum, t) => sum + t.amount, 0) / daysWithData;
-            const daysInMonth = 30;
-            const projectedMonthly = avgDailySpend * daysInMonth;
+            const projectedMonthly = avgDailySpend * 30;
             
             aiPatterns.predictions = {
                 projectedMonthlySpend: projectedMonthly,
@@ -1291,7 +1439,7 @@
                     </li>
                     <li class="flex items-start gap-2 text-sm text-gray-300">
                         <i class="fas fa-check text-emerald-400 mt-1"></i>
-                        <span>${currentLanguage === 'pt' ? 'Use a regra das 24 horas para compras acima de R$ 250' : 'Use the 24-hour rule for purchases over R$ 250'}</span>
+                        <span>${currentLanguage === 'pt' ? `Use a regra das 24 horas para compras acima de ${formatMoney(50)}` : `Use the 24-hour rule for purchases over ${formatMoney(50)}`}</span>
                     </li>
                 </ul>
             `;
@@ -1304,7 +1452,6 @@
             document.getElementById('ai-modal').classList.add('hidden');
         }
 
-        // Budget & Savings Functions
         function openBudgetModal() {
             document.getElementById('budget-modal').classList.remove('hidden');
             document.getElementById('budget-input').focus();
@@ -1389,7 +1536,6 @@
             
             document.getElementById('savings-goal-section').classList.remove('hidden');
             
-            // Update icon display
             const iconMap = {
                 'fa-plane': '✈️', 'fa-shopping-bag': '🛍️', 'fa-car': '🚗', 'fa-home': '🏠',
                 'fa-graduation-cap': '🎓', 'fa-heart': '❤️', 'fa-gamepad': '🎮', 'fa-laptop': '💻',
@@ -1402,7 +1548,7 @@
             document.getElementById('goal-desc-display').style.display = savingsGoal.description ? 'block' : 'none';
             
             document.getElementById('goal-target-display').textContent = formatMoney(savingsGoal.amount);
-            document.getElementById('goal-date-display').textContent = new Date(savingsGoal.deadline).toLocaleDateString(currentLanguage === 'pt' ? 'pt-BR' : 'en-US', { month: 'short', year: 'numeric' });
+            document.getElementById('goal-date-display').textContent = new Date(savingsGoal.deadline).toLocaleDateString(currencyConfig[currentCurrency].locale, { month: 'short', year: 'numeric' });
             document.getElementById('goal-current-display').textContent = formatMoney(savingsGoal.currentSavings);
             
             const percentage = Math.min(100, Math.max(0, (savingsGoal.currentSavings / savingsGoal.amount) * 100));
@@ -1639,6 +1785,7 @@
                 document.getElementById('user-initial').textContent = name[0].toUpperCase();
                 
                 initDatePicker();
+                loadSettings();
                 showNotification(currentLanguage === 'pt' ? 'Bem-vindo!' : 'Welcome!', `${currentLanguage === 'pt' ? 'Monitoramento ativado' : 'AI monitoring activated'}, ${name}!`, 'success');
             }, 500);
         });
@@ -1649,11 +1796,8 @@
         }
 
         function openBankModal() {
-            document.getElementById('bank-modal').classList.remove('hidden');
-        }
-
-        function closeBankModal() {
-            document.getElementById('bank-modal').classList.add('hidden');
+            // Placeholder - would open bank modal
+            showNotification('Info', 'Bank connection feature coming soon', 'info');
         }
 
         function updateChartWithData() {
@@ -1851,7 +1995,7 @@
                 const color = categoryColors[t.category];
                 const icon = categoryIcons[t.category];
                 const date = new Date(t.date);
-                const dateStr = date.toLocaleDateString(currentLanguage === 'pt' ? 'pt-BR' : 'en-US', { month: 'short', day: 'numeric' });
+                const dateStr = date.toLocaleDateString(currencyConfig[currentCurrency].locale, { month: 'short', day: 'numeric' });
                 
                 return `
                     <div class="transaction-item flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors slide-in group">
@@ -1950,6 +2094,7 @@
                 document.getElementById('display-name').textContent = currentUser.name;
                 document.getElementById('user-initial').textContent = currentUser.name[0].toUpperCase();
                 initDatePicker();
+                loadSettings();
             }
         });
     </script>
