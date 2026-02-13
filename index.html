@@ -669,9 +669,9 @@ input[type="date"].input-field::-webkit-calendar-picker-indicator { filter: inve
 
         <div style="display:flex;flex-direction:column;gap:1.5rem">
           <div class="panel" style="flex-shrink: 0;"><div class="panel-header" style="padding: 0.875rem 1.25rem;"><div class="panel-title" style="font-size: 0.75rem;"><i class="fas fa-plus"></i> Record Transaction</div></div><div class="panel-body" style="padding: 0.875rem 1.25rem; flex: none;"><div class="type-selector">
-                <button class="type-btn active-expense" id="btn-expense" onclick="setType('expense')">Expense</button>
-                <button class="type-btn" id="btn-income" onclick="setType('income')">Income</button>
-                <button class="type-btn" id="btn-save" onclick="setType('save')">Save</button>
+                <button type="button" class="type-btn active-expense" id="btn-expense" onclick="setType('expense')">Expense</button>
+                <button type="button" class="type-btn" id="btn-income" onclick="setType('income')">Income</button>
+                <button type="button" class="type-btn" id="btn-save" onclick="setType('save')">Save</button>
               </div>
               <div class="input-group">
                 <label class="input-label">Amount</label>
@@ -692,7 +692,7 @@ input[type="date"].input-field::-webkit-calendar-picker-indicator { filter: inve
                   <option value="others">📦 Others</option>
                 </select>
               </div>
-              <button class="btn-add" onclick="addTx()"><i class="fas fa-check"></i><span id="btn-add-label">Record Expense</span></button>
+              <button type="button" class="btn-add" onclick="addTx()"><i class="fas fa-check"></i><span id="btn-add-label">Record Expense</span></button>
             </div>
           </div>
 
